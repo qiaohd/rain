@@ -9,8 +9,8 @@ public interface RainMemberWalletService {
 
     /**
      * 初始化会员钱包信息
-     * @param id
+     * @param userId
      */
-    void initWallet(Long id);
+    void initWallet(Long userId);
     
 }

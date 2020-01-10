@@ -6,6 +6,7 @@ import com.rao.constant.server.ServiceInstanceConstant;
 import com.rao.util.result.ResultMessage;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 用户钱包 客户端
@@ -22,9 +23,10 @@ public interface MemberWalletClient {
 
     /**
      * 初始化会员钱包
+     * @param userId
      * @return
      */
     @PostMapping("/member/wallet/init")
-    ResultMessage init();
+    ResultMessage init(@RequestParam("userId") Long userId);
     
 }
