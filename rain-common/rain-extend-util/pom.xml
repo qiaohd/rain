@@ -34,6 +34,14 @@
             <artifactId>fastjson</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- 本地jar -->
+        <dependency>
+            <groupId>com.rao</groupId>
+            <artifactId>rain-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 本地jar -->
         
     </dependencies>
 

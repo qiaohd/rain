@@ -3,6 +3,7 @@ import java.util.Date;
 
 import com.alibaba.fastjson.JSONObject;
 import com.rao.cache.key.MessageCacheKey;
+import com.rao.cache.key.UserCacheKey;
 import com.rao.client.MemberWalletClient;
 import com.rao.constant.common.DateFormatEnum;
 import com.rao.constant.common.StateConstants;
@@ -24,6 +25,7 @@ import com.rao.pojo.entity.RainSystemUser;
 import com.rao.pojo.vo.LoginSuccessVO;
 import com.rao.service.LoginService;
 import com.rao.util.cache.RedisTemplateUtils;
+import com.rao.util.common.CacheConstant;
 import com.rao.util.common.RandomUtils;
 import com.rao.util.common.TwiterIdUtil;
 import com.rao.util.wx.WxAppletUtils;
@@ -111,7 +113,7 @@ public class LoginServiceImpl implements LoginService {
         if(!smsCacheCode.equals(smsCode)){
             throw BusinessException.operate("验证码不正确");
         }
-        // 获取 access_token
+        // 获取 access_token 和 refresh_token
         LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.ADMIN.getValue(), phone, "", false));
         return loginSuccessVO;
     }
@@ -141,8 +143,9 @@ public class LoginServiceImpl implements LoginService {
         if(!rainMember.getStatus().equals(StateConstants.STATE_ENABLE)){
             throw BusinessException.operate("账号不可用");
         }
-        
-        return null;
+        // 获取 access_token 和 refresh_token
+        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.C_USER.getValue(), userInfo.getPhoneNumber(), "", false));
+        return loginSuccessVO;
     }
 
     /**
@@ -173,8 +176,11 @@ public class LoginServiceImpl implements LoginService {
         rainMember.setCreateTime(now);
         rainMember.setUpdateTime(now);
         rainMemberDao.insert(rainMember);
-
-        memberWalletClient.init();
+        // 设置用户注册缓存，有效时间为 1 分钟
+        String userRegisterCacheKey = UserCacheKey.userRegisterCacheKey(memberId);
+        redisTemplateUtils.set(userRegisterCacheKey, String.valueOf(memberId), CacheConstant.TIME_ONE);
+        // 调用支付系统初始化用户钱包
+        memberWalletClient.init(memberId);
         return rainMember;
     }
 
