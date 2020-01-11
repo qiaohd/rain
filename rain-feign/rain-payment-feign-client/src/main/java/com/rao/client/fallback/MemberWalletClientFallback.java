@@ -19,7 +19,7 @@ public class MemberWalletClientFallback implements FallbackFactory<MemberWalletC
 
             @PostMapping("/member/wallet/init")
             @Override
-            public ResultMessage init() {
+            public ResultMessage init(Long userId) {
                 return ResultMessage.fail().message("初始化会员钱包失败");
             }
             

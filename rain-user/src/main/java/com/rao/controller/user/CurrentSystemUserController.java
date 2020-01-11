@@ -6,8 +6,7 @@ import com.rao.pojo.dto.RePasswordDTO;
 import com.rao.pojo.vo.user.UserInfoVO;
 import com.rao.service.user.CurrentUserService;
 import com.rao.util.result.ResultMessage;
-//import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import com.rao.pojo.vo.user.CurrentSystemUserVO;
 
