@@ -1,39 +1,29 @@
 package com.rao.service.impl;
-import java.util.Date;
 
 import com.alibaba.fastjson.JSONObject;
 import com.rao.cache.key.MessageCacheKey;
-import com.rao.cache.key.UserCacheKey;
-import com.rao.client.MemberWalletClient;
-import com.rao.constant.common.DateFormatEnum;
 import com.rao.component.LoginLogoutProducer;
 import com.rao.constant.common.StateConstants;
 import com.rao.constant.server.ServiceInstanceConstant;
 import com.rao.constant.sms.SmsOperationTypeEnum;
+import com.rao.constant.user.LoginSettingEnum;
 import com.rao.constant.user.OperationTypeEnum;
 import com.rao.constant.user.UserCommonConstant;
 import com.rao.constant.user.UserTypeEnum;
-import com.rao.dao.RainMemberDao;
-import com.rao.dao.RainSystemUserDao;
 import com.rao.dto.WxUserInfo;
 import com.rao.exception.BusinessException;
-import com.rao.exception.DefaultSuccessMsgEnum;
+import com.rao.pojo.bo.LoginUserBO;
 import com.rao.pojo.bo.OauthTokenResponse;
 import com.rao.pojo.bo.UserLoginLogoutLogBO;
 import com.rao.pojo.dto.PasswordLoginDTO;
 import com.rao.pojo.dto.RefreshTokenDTO;
 import com.rao.pojo.dto.SmsCodeLoginDTO;
 import com.rao.pojo.dto.WxLoginDTO;
-import com.rao.pojo.entity.RainMember;
-import com.rao.pojo.entity.RainSystemUser;
 import com.rao.pojo.vo.LoginSuccessVO;
 import com.rao.service.LoginService;
+import com.rao.service.UserService;
 import com.rao.util.CopyUtil;
 import com.rao.util.cache.RedisTemplateUtils;
-import com.rao.util.common.CacheConstant;
-import com.rao.util.common.RandomUtils;
-import com.rao.util.common.TwiterIdUtil;
-import com.rao.util.result.ResultMessage;
 import com.rao.util.wx.WxAppletUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -66,9 +56,7 @@ import javax.servlet.http.HttpServletRequest;
 public class LoginServiceImpl implements LoginService {
 
     @Resource
-    private RainSystemUserDao rainSystemUserDao;
-    @Resource
-    private RainMemberDao rainMemberDao;
+    private UserService userService;
     @Resource
     private RedisTemplateUtils redisTemplateUtils;
     @Resource
@@ -78,55 +66,54 @@ public class LoginServiceImpl implements LoginService {
     @Resource
     private LoadBalancerClient loadBalancerClient;
     @Resource
-    private MemberWalletClient memberWalletClient;
-    @Resource
     private TokenStore tokenStore;
     @Resource
     private LoginLogoutProducer loginLogoutProducer;
 
     @Override
-    public LoginSuccessVO loginAdmin(PasswordLoginDTO passwordLoginDTO) {
-        // 认证
+    public LoginSuccessVO pwdLogin(PasswordLoginDTO passwordLoginDTO) {
+        // 检查是否可以操作
+        String accountType = passwordLoginDTO.getAccountType();
+        this.checkOperation(OperationTypeEnum.LOG_IN_PWD, accountType);
+
+        // 校验用户
         String userName = passwordLoginDTO.getUsername();
-        RainSystemUser systemUser = rainSystemUserDao.findByUserNameOrPhone(userName);
-        if (systemUser == null) {
+        LoginUserBO loginUserBO = userService.findByUserNameOrPhoneAndUserType(userName, accountType);
+        if (loginUserBO == null) {
             throw BusinessException.operate("账号不存在");
         } else {
-            if (!systemUser.getStatus().equals(StateConstants.STATE_ENABLE)) {
+            if (!loginUserBO.getStatus().equals(StateConstants.STATE_ENABLE)) {
                 throw BusinessException.operate("账号不可用");
             }
-            if (!passwordEncoder.matches(passwordLoginDTO.getPassword(), systemUser.getPassword())) {
+            if (!passwordEncoder.matches(passwordLoginDTO.getPassword(), loginUserBO.getPassword())) {
                 throw BusinessException.operate("密码错误，请重新输入");
             }
         }
+
         // 获取 access_token
-        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.ADMIN.getValue(), userName, passwordLoginDTO.getPassword(), true));
+        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(accountType, userName, passwordLoginDTO.getPassword(), true));
         //发送登录日志
-        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(systemUser, UserLoginLogoutLogBO.class);
-        userLoginLogoutLogBO.setUserId(systemUser.getId());
-        userLoginLogoutLogBO.setUserType(UserTypeEnum.ADMIN.getValue());
+        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
+        userLoginLogoutLogBO.setUserId(loginUserBO.getId());
+        userLoginLogoutLogBO.setUserType(accountType);
         loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_PWD);
         return loginSuccessVO;
     }
 
     @Override
-    public LoginSuccessVO refreshToken(RefreshTokenDTO refreshTokenDTO) {
-        Integer accountType = refreshTokenDTO.getAccountType();
-        String refreshToken = refreshTokenDTO.getRefreshToken();
-        String type = accountType == 1 ? UserTypeEnum.ADMIN.getValue() : UserTypeEnum.C_USER.getValue();
-        return requestAccessToken(buildRefreshTokenParam(type, refreshToken, refreshTokenDTO.getLoginType().equals(UserCommonConstant.PWD_LOGIN)));
-    }
+    public LoginSuccessVO smsCodeLogin(SmsCodeLoginDTO smsCodeLoginDTO) {
+        // 检查是否可以操作
+        String accountType = smsCodeLoginDTO.getAccountType();
+        this.checkOperation(OperationTypeEnum.LOG_IN_SMS_CODE, accountType);
 
-    @Override
-    public LoginSuccessVO smsCodeLoginSystemUser(SmsCodeLoginDTO smsCodeLoginDTO) {
+        // 通过手机号码查询用户信息并校验
         String phone = smsCodeLoginDTO.getPhone();
         String smsCode = smsCodeLoginDTO.getSmsCode();
-        // 通过手机号码查询用户信息
-        RainSystemUser systemUser = rainSystemUserDao.findByUserNameOrPhone(phone);
-        if(systemUser == null || !systemUser.getStatus().equals(StateConstants.STATE_ENABLE)){
+        LoginUserBO loginUserBO = userService.findByUserNameOrPhoneAndUserType(phone, accountType);
+        if(loginUserBO == null || !loginUserBO.getStatus().equals(StateConstants.STATE_ENABLE)){
             throw BusinessException.operate("账号不存在或不可用");
         }
-        String smsCacheKey = MessageCacheKey.smsCacheKey(SmsOperationTypeEnum.LOGIN, UserTypeEnum.ADMIN.getValue(), phone);
+        String smsCacheKey = MessageCacheKey.smsCacheKey(SmsOperationTypeEnum.LOGIN, accountType, phone);
         if(!redisTemplateUtils.isExists(smsCacheKey)){
             throw BusinessException.operate("验证码已过期，请重新获取");
         }
@@ -136,13 +123,65 @@ public class LoginServiceImpl implements LoginService {
             throw BusinessException.operate("验证码不正确");
         }
         // 获取 access_token 和 refresh_token
-        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.ADMIN.getValue(), phone, "", false));
+        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(accountType, phone, "", false));
         //发送登录日志
-        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(systemUser, UserLoginLogoutLogBO.class);
-        userLoginLogoutLogBO.setUserId(systemUser.getId());
-        userLoginLogoutLogBO.setUserType(UserTypeEnum.ADMIN.getValue());
+        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
+        userLoginLogoutLogBO.setUserId(loginUserBO.getId());
+        userLoginLogoutLogBO.setUserType(accountType);
         loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_SMS_CODE);
+        // 删除缓存中的短信验证码
+        redisTemplateUtils.delete(smsCacheKey);
         return loginSuccessVO;
+    }
+
+    @Override
+    public LoginSuccessVO wxLogin(WxLoginDTO wxLoginDTO) {
+        // 检查是否可以操作
+        String accountType = wxLoginDTO.getAccountType();
+        this.checkOperation(OperationTypeEnum.LOG_IN_WX, accountType);
+
+        // 获取微信用户信息
+        JSONObject sessionKeyOropenid = WxAppletUtils.getSessionKeyOropenid(wxLoginDTO.getCode());
+        log.info("获取微信登录信息:{}", sessionKeyOropenid.toJSONString());
+        String openId = sessionKeyOropenid.getString("openid");
+        String sessionKey = sessionKeyOropenid.getString("session_key");
+        if(StringUtils.isBlank(openId)|| StringUtils.isBlank(sessionKey)){
+            log.error("openId:{}, sessionKey:{}", openId, sessionKey);
+            throw BusinessException.operate("参数无效");
+        }
+        WxUserInfo userInfo = WxAppletUtils.getUserInfo(wxLoginDTO.getEncryptedData(), sessionKey, wxLoginDTO.getIv());
+        log.info("解密微信用户授权信息:{}", userInfo);
+
+        // 通过openID查询用户信息
+        LoginUserBO loginUserBO = userService.findByOpenIdAndUserType(openId, accountType);
+        if(loginUserBO == null){
+            if(accountType.equals(UserTypeEnum.C_USER.getValue())){
+                // 注册用户
+                userService.registerMember(openId, userInfo);
+            }else{
+                throw BusinessException.operate("账号不存在");
+            }
+        }
+
+        if(!loginUserBO.getStatus().equals(StateConstants.STATE_ENABLE)){
+            throw BusinessException.operate("账号不可用");
+        }
+        // 获取 access_token 和 refresh_token
+        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(accountType, userInfo.getPhoneNumber(), "", false));
+        //发送登录日志
+        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
+        userLoginLogoutLogBO.setUserId(loginUserBO.getId());
+        userLoginLogoutLogBO.setUserType(accountType);
+        loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_WX);
+        return loginSuccessVO;
+    }
+
+    @Override
+    public LoginSuccessVO refreshToken(RefreshTokenDTO refreshTokenDTO) {
+        Integer accountType = refreshTokenDTO.getAccountType();
+        String refreshToken = refreshTokenDTO.getRefreshToken();
+        String type = accountType == 1 ? UserTypeEnum.ADMIN.getValue() : UserTypeEnum.C_USER.getValue();
+        return requestAccessToken(buildRefreshTokenParam(type, refreshToken, refreshTokenDTO.getLoginType().equals(UserCommonConstant.PWD_LOGIN)));
     }
 
     @Override
@@ -157,87 +196,6 @@ public class LoginServiceImpl implements LoginService {
         tokenStore.removeAccessToken(accessToken);
         //发送登出日志
         loginLogoutProducer.sendLogMsg(OperationTypeEnum.LOG_OUT);
-    }
-
-    @Override
-    public LoginSuccessVO wxLoginCUser(WxLoginDTO wxLoginDTO) {
-        JSONObject sessionKeyOropenid = WxAppletUtils.getSessionKeyOropenid(wxLoginDTO.getCode());
-        log.info("获取微信登录信息:{}", sessionKeyOropenid.toJSONString());
-        String openId = sessionKeyOropenid.getString("openid");
-        String sessionKey = sessionKeyOropenid.getString("session_key");
-        if(StringUtils.isBlank(openId)|| StringUtils.isBlank(sessionKey)){
-            log.error("openId:{}, sessionKey:{}", openId, sessionKey);
-            throw BusinessException.operate("参数无效");
-        }
-        
-        // 获取微信用户信息
-        WxUserInfo userInfo = WxAppletUtils.getUserInfo(wxLoginDTO.getEncryptedData(), sessionKey, wxLoginDTO.getIv());
-        log.info("解密微信用户授权信息:{}", userInfo);
-
-        // 通过openID查询用户信息
-        RainMember rainMember = rainMemberDao.findByWxOpenId(openId);
-        if(rainMember == null){
-            // 注册用户
-            this.registerMember(openId, userInfo);
-        }
-
-        if(!rainMember.getStatus().equals(StateConstants.STATE_ENABLE)){
-            throw BusinessException.operate("账号不可用");
-        }
-        // 获取 access_token 和 refresh_token
-        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.C_USER.getValue(), userInfo.getPhoneNumber(), "", false));
-        //发送登录日志
-        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(rainMember, UserLoginLogoutLogBO.class);
-        userLoginLogoutLogBO.setUserId(rainMember.getId());
-        userLoginLogoutLogBO.setUserType(UserTypeEnum.ADMIN.getValue());
-        loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_WX);
-        return loginSuccessVO;
-    }
-
-    /**
-     * 初始化会员账号
-     * @param wxOpenId
-     * @param wxUserInfo
-     * @return
-     */
-    private RainMember registerMember(String wxOpenId, WxUserInfo wxUserInfo){
-        /**
-         * 调用支付系统初始化用户钱包
-         */
-        Long memberId = TwiterIdUtil.getTwiterId();
-        // 设置用户注册缓存，有效时间为 1 分钟
-        String userRegisterCacheKey = UserCacheKey.userRegisterCacheKey(memberId);
-        redisTemplateUtils.set(userRegisterCacheKey, String.valueOf(memberId), CacheConstant.TIME_ONE);
-        // 调用支付系统初始化用户钱包
-        ResultMessage resultMessage = memberWalletClient.init(memberId);
-        if(!resultMessage.getCode().equals(DefaultSuccessMsgEnum.SUCCESS.getCode())){
-            throw BusinessException.operate("系统故障，登录失败");
-        }
-
-        /**
-         * 注册用户信息
-         */
-        String userName = RandomUtils.randomStringWithTime(6, DateFormatEnum.FORMAT_CONNECT_EXTEND.getFormatString());
-        Date now = new Date();
-        RainMember rainMember = new RainMember();
-        rainMember.setId(memberId);
-        rainMember.setUserName(userName);
-        rainMember.setPhone(wxUserInfo.getPhoneNumber());
-        // 初始密码为 "" 的加密串
-        rainMember.setPassword(UserCommonConstant.DEFAULT_PWD);
-        rainMember.setNickname(userName);
-        rainMember.setWxOpenid(wxOpenId);
-        rainMember.setWxNickname(wxUserInfo.getNickName());
-        rainMember.setEmail("");
-        rainMember.setAvatar(wxUserInfo.getAvatarUrl());
-        rainMember.setGender(wxUserInfo.getGender().equals("男") ? 1 : 2);
-        rainMember.setStatus(StateConstants.STATE_ENABLE);
-        rainMember.setPersonalSignature("");
-        rainMember.setBirthday(now);
-        rainMember.setCreateTime(now);
-        rainMember.setUpdateTime(now);
-        rainMemberDao.insert(rainMember);
-        return rainMember;
     }
 
     /**
@@ -308,6 +266,19 @@ public class LoginServiceImpl implements LoginService {
         // 是否密码登录
         param.add("pwdLogin", pwdLogin ? "true" : "false");
         return param;
+    }
+
+    /**
+     * 检查操作类型
+     * @param operationType
+     * @param accountType
+     */
+    private void checkOperation(OperationTypeEnum operationType, String accountType){
+        UserTypeEnum userTypeEnum = UserTypeEnum.ofValue(accountType);
+        boolean open = LoginSettingEnum.checkOpen(userTypeEnum, operationType);
+        if(!open){
+            throw BusinessException.operate("暂不支持该操作");
+        }
     }
 
 }

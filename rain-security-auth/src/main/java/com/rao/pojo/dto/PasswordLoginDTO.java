@@ -23,5 +23,11 @@ public class PasswordLoginDTO {
      */
     @NotBlank(message = "密码不能为空")
     private String password;
+
+    /**
+     * 账号类型
+     */
+    @NotBlank(message = "账号类型不能为空")
+    private String accountType;
     
 }

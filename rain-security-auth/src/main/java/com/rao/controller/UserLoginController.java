@@ -27,44 +27,35 @@ public class UserLoginController {
 
 
     /**
-     * 后台用户账号密码登录
+     * 用户账号密码登录
      * @param passwordLoginDTO
      * @return
      */
-    @PostMapping(value = "/login/system_user")
+    @PostMapping(value = "/login/pwd")
     public ResultMessage<LoginSuccessVO> loginSystemUser(@BeanValid @RequestBody PasswordLoginDTO passwordLoginDTO) {
-        LoginSuccessVO loginSuccessVO = loginService.loginAdmin(passwordLoginDTO);
+        LoginSuccessVO loginSuccessVO = loginService.pwdLogin(passwordLoginDTO);
         return ResultMessage.success(loginSuccessVO).message("登录成功");
     }
 
     /**
-     * 后台用户短信验证码登录
+     * 用户短信验证码登录
      * @param smsCodeLoginDTO
      * @return
      */
-    @PostMapping(value = "/login/sms_code/system_user")
+    @PostMapping(value = "/login/sms_code")
     public ResultMessage<LoginSuccessVO> smsCodeLoginSystemUser(@BeanValid @RequestBody SmsCodeLoginDTO smsCodeLoginDTO){
-        LoginSuccessVO loginSuccessVO = loginService.smsCodeLoginSystemUser(smsCodeLoginDTO);
+        LoginSuccessVO loginSuccessVO = loginService.smsCodeLogin(smsCodeLoginDTO);
         return ResultMessage.success(loginSuccessVO).message("登录成功");
     }
 
     /**
-     * C端用户账号密码登录
-     * @return
-     */
-    @PostMapping(value = "/login/c_user")
-    public ResultMessage<LoginSuccessVO> loginCUser(){
-        return ResultMessage.fail().message("暂未实现");
-    }
-
-    /**
-     * C端用户登录微信第三方登录
+     * 用户登录微信第三方登录
      * @param wxLoginDTO
      * @return
      */
-    @PostMapping(value = "/login/wx/c_user")
+    @PostMapping(value = "/login/wx")
     public ResultMessage wxLoginCUser(@BeanValid @RequestBody WxLoginDTO wxLoginDTO){
-        LoginSuccessVO loginSuccessVO = loginService.wxLoginCUser(wxLoginDTO);
+        LoginSuccessVO loginSuccessVO = loginService.wxLogin(wxLoginDTO);
         return ResultMessage.success(loginSuccessVO).message("登录成功");
     }
 

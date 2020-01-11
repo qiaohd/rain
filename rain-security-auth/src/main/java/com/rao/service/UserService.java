@@ -1,7 +1,9 @@
 package com.rao.service;
 
+import com.rao.dto.WxUserInfo;
 import com.rao.pojo.bo.LoginUserBO;
 import com.rao.pojo.dto.SmsSendDTO;
+import com.rao.pojo.entity.RainMember;
 
 /**
  * 用户 service
@@ -19,8 +21,25 @@ public interface UserService {
     LoginUserBO findByUserNameOrPhoneAndUserType(String userName, String type);
 
     /**
+     * 通过openID，用户类型查询用户信息
+     * @param openId
+     * @param accountType
+     * @return
+     */
+    LoginUserBO findByOpenIdAndUserType(String openId, String accountType);
+
+    /**
+     * 注册c端用户信息
+     * @param wxOpenId
+     * @param wxUserInfo
+     * @return
+     */
+    RainMember registerMember(String wxOpenId, WxUserInfo wxUserInfo);
+
+    /**
      * 检查账号状态
      * @param smsSendDTO
      */
     void checkAccount(SmsSendDTO smsSendDTO);
+
 }

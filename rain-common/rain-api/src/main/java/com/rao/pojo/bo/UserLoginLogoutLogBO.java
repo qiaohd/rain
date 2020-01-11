@@ -35,7 +35,7 @@ public class UserLoginLogoutLogBO {
     private String phone;
 
     /**
-     * 类型 1-登录 2-登出
+     * 操作类型
      */
     private Integer type;
 

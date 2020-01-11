@@ -24,4 +24,10 @@ public class SmsCodeLoginDTO {
     @NotBlank(message = "手机验证码不能为空")
     private String smsCode;
 
+    /**
+     * 账号类型
+     */
+    @NotBlank(message = "账号类型不能为空")
+    private String accountType;
+
 }

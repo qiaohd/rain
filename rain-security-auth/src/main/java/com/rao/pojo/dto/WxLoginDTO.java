@@ -30,4 +30,10 @@ public class WxLoginDTO {
     @NotBlank(message = "iv不能为空")
     private String iv;
 
+    /**
+     * 账号类型
+     */
+    @NotBlank(message = "账号类型不能为空")
+    private String accountType;
+
 }
