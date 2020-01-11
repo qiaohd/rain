@@ -19,11 +19,9 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Override
-    public void configure(HttpSecurity http) throws Exception {
-        http
-                .exceptionHandling().authenticationEntryPoint(new AuthExceptionEntryPoint())
-                .and()
-                .authorizeRequests().anyRequest().authenticated();
+    public void configure(ResourceServerSecurityConfigurer resources) {
+        resources.resourceId("backend-resources").stateless(true);
+        resources.authenticationEntryPoint(new AuthExceptionEntryPoint());
     }
 
 }

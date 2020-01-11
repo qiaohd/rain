@@ -20,11 +20,6 @@ import java.util.Date;
 public class UserLoginLogoutLogBO {
 
     /**
-     * id
-     */
-    private Long id;
-
-    /**
      * 用户id
      */
     private Long userId;
@@ -75,12 +70,12 @@ public class UserLoginLogoutLogBO {
     private String isp;
 
     /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
      * 用户类型
      */
     private String userType;
+
+    /**
+     * 发送时间
+     */
+    private Date sendTime;
 }

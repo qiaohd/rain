@@ -69,7 +69,7 @@ public class RoleServiceImpl implements RoleService {
         List<RainRole> rainRoleList = rainRoleDao.selectAll();
         PageInfo<RainRole> pageInfo = PageInfo.of(rainRoleList);
         // 封装视图模型
-        List<PageRoleVO> roleVOList = CopyUtil.transToOList(rainRoleList, PageRoleVO.class);
+        List<PageRoleVO> roleVOList = CopyUtil.transToObjList(rainRoleList, PageRoleVO.class);
         return PageResult.build(pageInfo.getTotal(), roleVOList);
     }
 
@@ -79,7 +79,7 @@ public class RoleServiceImpl implements RoleService {
         if(null==rainRole){
             throw BusinessException.operate(id + "不存在");
         }
-        RoleDetailVO roleDetailVO = CopyUtil.transToO(rainRole, RoleDetailVO.class);
+        RoleDetailVO roleDetailVO = CopyUtil.transToObj(rainRole, RoleDetailVO.class);
         Example example = new Example(RainRolePermission.class);
         example.createCriteria().andEqualTo("roleId", id);
         List<RainRolePermission> rainRolePermissions = rainRolePermissionDao.selectByExample(example);
@@ -91,7 +91,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<ListRoleVO> listRole() {
         List<RainRole> rainRoleList = rainRoleDao.selectAll();
-        List<ListRoleVO> roleList = CopyUtil.transToOList(rainRoleList, ListRoleVO.class);
+        List<ListRoleVO> roleList = CopyUtil.transToObjList(rainRoleList, ListRoleVO.class);
         return roleList;
     }
 

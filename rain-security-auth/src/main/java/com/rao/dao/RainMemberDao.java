@@ -46,5 +46,11 @@ public interface RainMemberDao {
      * @return
      */
     RainMember findByWxOpenId(@Param("wxOpenid") String wxOpenId);
-    
+
+    /**
+     * 通过用户名或手机号码查询用户信息
+     * @param account
+     * @return
+     */
+    RainMember findByUserNameOrPhone(@Param("account") String account);
 }

@@ -59,7 +59,7 @@ public class SystemUserServiceImpl implements SystemUserService {
         List<RainSystemUser> systemUserList = rainSystemUserDao.selectAll();
         PageInfo pageInfo = PageInfo.of(systemUserList);
         // 封装视图模型
-        List<SystemUserVO> systemUserVOList = CopyUtil.transToOList(systemUserList, SystemUserVO.class);
+        List<SystemUserVO> systemUserVOList = CopyUtil.transToObjList(systemUserList, SystemUserVO.class);
 
         return PageResult.build(pageInfo.getTotal(), systemUserVOList);
     }
@@ -67,7 +67,7 @@ public class SystemUserServiceImpl implements SystemUserService {
     @Override
     public SystemUserDetailVO findSystemUserById(Long id) {
         RainSystemUser rainSystemUser = rainSystemUserDao.selectByPrimaryKey(id);
-        SystemUserDetailVO systemUserDetailVO = CopyUtil.transToO(rainSystemUser, SystemUserDetailVO.class);
+        SystemUserDetailVO systemUserDetailVO = CopyUtil.transToObj(rainSystemUser, SystemUserDetailVO.class);
 
         //查询用户下的角色
         Example userRoleExample = new Example(RainUserRole.class);
@@ -77,7 +77,7 @@ public class SystemUserServiceImpl implements SystemUserService {
         //查询关联表
 
         //封装用户角色信息
-        List<UserRoleVO> userRoleVOList = CopyUtil.transToOList(userRoleList, UserRoleVO.class);
+        List<UserRoleVO> userRoleVOList = CopyUtil.transToObjList(userRoleList, UserRoleVO.class);
         systemUserDetailVO.setUserRoleVOList(userRoleVOList);
         return systemUserDetailVO;
     }
@@ -198,7 +198,7 @@ public class SystemUserServiceImpl implements SystemUserService {
             userRoleExample = new Example(RainUserRole.class);
             userRoleExample.createCriteria().andIn("id",rainUserRoleList.stream().map(item->item.getRoleId()).collect(Collectors.toList()));
             List<RainRole> rainRoleList = rainRoleDao.selectByExample(userRoleExample);
-            List<UserRoleVO> userRoleVOList = CopyUtil.transToOList(rainRoleList, UserRoleVO.class);
+            List<UserRoleVO> userRoleVOList = CopyUtil.transToObjList(rainRoleList, UserRoleVO.class);
             return UserRoleListVO.builder().roleList(userRoleVOList).build();
         }else{
             return UserRoleListVO.builder().roleList(new ArrayList<>()).build();

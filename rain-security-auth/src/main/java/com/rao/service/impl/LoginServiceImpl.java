@@ -10,12 +10,14 @@ import com.rao.component.LoginLogoutProducer;
 import com.rao.constant.common.StateConstants;
 import com.rao.constant.server.ServiceInstanceConstant;
 import com.rao.constant.sms.SmsOperationTypeEnum;
+import com.rao.constant.user.OperationTypeEnum;
 import com.rao.constant.user.UserCommonConstant;
 import com.rao.constant.user.UserTypeEnum;
 import com.rao.dao.RainMemberDao;
 import com.rao.dao.RainSystemUserDao;
 import com.rao.dto.WxUserInfo;
 import com.rao.exception.BusinessException;
+import com.rao.exception.DefaultSuccessMsgEnum;
 import com.rao.pojo.bo.OauthTokenResponse;
 import com.rao.pojo.bo.UserLoginLogoutLogBO;
 import com.rao.pojo.dto.PasswordLoginDTO;
@@ -31,6 +33,7 @@ import com.rao.util.cache.RedisTemplateUtils;
 import com.rao.util.common.CacheConstant;
 import com.rao.util.common.RandomUtils;
 import com.rao.util.common.TwiterIdUtil;
+import com.rao.util.result.ResultMessage;
 import com.rao.util.wx.WxAppletUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -41,6 +44,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -98,9 +102,10 @@ public class LoginServiceImpl implements LoginService {
         // 获取 access_token
         LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.ADMIN.getValue(), userName, passwordLoginDTO.getPassword(), true));
         //发送登录日志
-        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToO(systemUser,UserLoginLogoutLogBO.class);
+        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(systemUser, UserLoginLogoutLogBO.class);
+        userLoginLogoutLogBO.setUserId(systemUser.getId());
         userLoginLogoutLogBO.setUserType(UserTypeEnum.ADMIN.getValue());
-        loginLogoutProducer.LoginSendLogMsg(userLoginLogoutLogBO);
+        loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_PWD);
         return loginSuccessVO;
     }
 
@@ -132,6 +137,11 @@ public class LoginServiceImpl implements LoginService {
         }
         // 获取 access_token 和 refresh_token
         LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.ADMIN.getValue(), phone, "", false));
+        //发送登录日志
+        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(systemUser, UserLoginLogoutLogBO.class);
+        userLoginLogoutLogBO.setUserId(systemUser.getId());
+        userLoginLogoutLogBO.setUserType(UserTypeEnum.ADMIN.getValue());
+        loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_SMS_CODE);
         return loginSuccessVO;
     }
 
@@ -140,10 +150,13 @@ public class LoginServiceImpl implements LoginService {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
         String token = request.getParameter("access_token");
-        OAuth2AccessToken oAuth2AccessToken = tokenStore.readAccessToken(token);
-        tokenStore.removeAccessToken(oAuth2AccessToken);
+        OAuth2AccessToken accessToken = tokenStore.readAccessToken(token);
+        OAuth2RefreshToken refreshToken = accessToken.getRefreshToken();
+        tokenStore.removeAccessTokenUsingRefreshToken(refreshToken);
+        tokenStore.removeRefreshToken(refreshToken);
+        tokenStore.removeAccessToken(accessToken);
         //发送登出日志
-        loginLogoutProducer.sendLogMsg();
+        loginLogoutProducer.sendLogMsg(OperationTypeEnum.LOG_OUT);
     }
 
     @Override
@@ -173,6 +186,11 @@ public class LoginServiceImpl implements LoginService {
         }
         // 获取 access_token 和 refresh_token
         LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.C_USER.getValue(), userInfo.getPhoneNumber(), "", false));
+        //发送登录日志
+        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(rainMember, UserLoginLogoutLogBO.class);
+        userLoginLogoutLogBO.setUserId(rainMember.getId());
+        userLoginLogoutLogBO.setUserType(UserTypeEnum.ADMIN.getValue());
+        loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_WX);
         return loginSuccessVO;
     }
 
@@ -183,8 +201,23 @@ public class LoginServiceImpl implements LoginService {
      * @return
      */
     private RainMember registerMember(String wxOpenId, WxUserInfo wxUserInfo){
-        String userName = RandomUtils.randomStringWithTime(6, DateFormatEnum.FORMAT_CONNECT_EXTEND.getFormatString());
+        /**
+         * 调用支付系统初始化用户钱包
+         */
         Long memberId = TwiterIdUtil.getTwiterId();
+        // 设置用户注册缓存，有效时间为 1 分钟
+        String userRegisterCacheKey = UserCacheKey.userRegisterCacheKey(memberId);
+        redisTemplateUtils.set(userRegisterCacheKey, String.valueOf(memberId), CacheConstant.TIME_ONE);
+        // 调用支付系统初始化用户钱包
+        ResultMessage resultMessage = memberWalletClient.init(memberId);
+        if(!resultMessage.getCode().equals(DefaultSuccessMsgEnum.SUCCESS.getCode())){
+            throw BusinessException.operate("系统故障，登录失败");
+        }
+
+        /**
+         * 注册用户信息
+         */
+        String userName = RandomUtils.randomStringWithTime(6, DateFormatEnum.FORMAT_CONNECT_EXTEND.getFormatString());
         Date now = new Date();
         RainMember rainMember = new RainMember();
         rainMember.setId(memberId);
@@ -204,11 +237,6 @@ public class LoginServiceImpl implements LoginService {
         rainMember.setCreateTime(now);
         rainMember.setUpdateTime(now);
         rainMemberDao.insert(rainMember);
-        // 设置用户注册缓存，有效时间为 1 分钟
-        String userRegisterCacheKey = UserCacheKey.userRegisterCacheKey(memberId);
-        redisTemplateUtils.set(userRegisterCacheKey, String.valueOf(memberId), CacheConstant.TIME_ONE);
-        // 调用支付系统初始化用户钱包
-        memberWalletClient.init(memberId);
         return rainMember;
     }
 

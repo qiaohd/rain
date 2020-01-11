@@ -63,6 +63,13 @@
         </dependency>
         <!-- mybatis -->
 
+        <!-- feign 客户端 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!-- feign 客户端 -->
+
         <!-- rocketmq -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>

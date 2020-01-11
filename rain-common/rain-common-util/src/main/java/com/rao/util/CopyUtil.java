@@ -22,9 +22,9 @@ public class CopyUtil {
      * @return
      * @throws Exception
      */
-    public static  <T, S> List<T> transToOList(List<S> source, Class<T> targetClazz) {
+    public static  <T, S> List<T> transToObjList(List<S> source, Class<T> targetClazz) {
         return source.stream().map(item -> {
-            T target = transToO(item, targetClazz);
+            T target = transToObj(item, targetClazz);
             return target;
         }).collect(Collectors.toList());
     }
@@ -37,7 +37,7 @@ public class CopyUtil {
      * @param <S>
      * @return
      */
-    public static <T, S> T transToO(S source, Class<T> targetClazz) {
+    public static <T, S> T transToObj(S source, Class<T> targetClazz) {
         if (source == null) {
             return null;
         }

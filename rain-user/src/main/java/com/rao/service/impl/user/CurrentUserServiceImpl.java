@@ -10,7 +10,6 @@ import com.rao.pojo.entity.user.RainSystemUser;
 import com.rao.pojo.vo.user.UserInfoVO;
 import com.rao.pojo.vo.user.UserRoleVO;
 import com.rao.util.CopyUtil;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -70,7 +69,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
                 Example roleIdExample = new Example(RainUserRole.class);
                 roleIdExample.createCriteria().andIn("id",rainUserRoleList.stream().map(item->item.getRoleId()).collect(Collectors.toList()));
                 List<RainRole> rainRoleList = rainRoleDao.selectByExample(roleIdExample);
-                List<UserRoleVO> userRoleVOList = CopyUtil.transToOList(rainRoleList, UserRoleVO.class);
+                List<UserRoleVO> userRoleVOList = CopyUtil.transToObjList(rainRoleList, UserRoleVO.class);
                 userInfoVO.setUserRoleVOList(userRoleVOList);
             }
             return userInfoVO;
