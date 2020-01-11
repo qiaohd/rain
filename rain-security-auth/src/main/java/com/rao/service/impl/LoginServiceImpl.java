@@ -1,13 +1,18 @@
 package com.rao.service.impl;
+import java.util.Date;
 
 import com.alibaba.fastjson.JSONObject;
 import com.rao.cache.key.MessageCacheKey;
+import com.rao.cache.key.UserCacheKey;
+import com.rao.client.MemberWalletClient;
+import com.rao.constant.common.DateFormatEnum;
 import com.rao.component.LoginLogoutProducer;
 import com.rao.constant.common.StateConstants;
 import com.rao.constant.server.ServiceInstanceConstant;
 import com.rao.constant.sms.SmsOperationTypeEnum;
 import com.rao.constant.user.UserCommonConstant;
 import com.rao.constant.user.UserTypeEnum;
+import com.rao.dao.RainMemberDao;
 import com.rao.dao.RainSystemUserDao;
 import com.rao.dto.WxUserInfo;
 import com.rao.exception.BusinessException;
@@ -17,11 +22,15 @@ import com.rao.pojo.dto.PasswordLoginDTO;
 import com.rao.pojo.dto.RefreshTokenDTO;
 import com.rao.pojo.dto.SmsCodeLoginDTO;
 import com.rao.pojo.dto.WxLoginDTO;
+import com.rao.pojo.entity.RainMember;
 import com.rao.pojo.entity.RainSystemUser;
 import com.rao.pojo.vo.LoginSuccessVO;
 import com.rao.service.LoginService;
 import com.rao.util.CopyUtil;
 import com.rao.util.cache.RedisTemplateUtils;
+import com.rao.util.common.CacheConstant;
+import com.rao.util.common.RandomUtils;
+import com.rao.util.common.TwiterIdUtil;
 import com.rao.util.wx.WxAppletUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -55,6 +64,8 @@ public class LoginServiceImpl implements LoginService {
     @Resource
     private RainSystemUserDao rainSystemUserDao;
     @Resource
+    private RainMemberDao rainMemberDao;
+    @Resource
     private RedisTemplateUtils redisTemplateUtils;
     @Resource
     private BCryptPasswordEncoder passwordEncoder;
@@ -62,6 +73,8 @@ public class LoginServiceImpl implements LoginService {
     private RestTemplate restTemplate;
     @Resource
     private LoadBalancerClient loadBalancerClient;
+    @Resource
+    private MemberWalletClient memberWalletClient;
     @Resource
     private TokenStore tokenStore;
     @Resource
@@ -117,7 +130,7 @@ public class LoginServiceImpl implements LoginService {
         if(!smsCacheCode.equals(smsCode)){
             throw BusinessException.operate("验证码不正确");
         }
-        // 获取 access_token
+        // 获取 access_token 和 refresh_token
         LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.ADMIN.getValue(), phone, "", false));
         return loginSuccessVO;
     }
@@ -136,16 +149,67 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public LoginSuccessVO wxLoginCUser(WxLoginDTO wxLoginDTO) {
         JSONObject sessionKeyOropenid = WxAppletUtils.getSessionKeyOropenid(wxLoginDTO.getCode());
+        log.info("获取微信登录信息:{}", sessionKeyOropenid.toJSONString());
         String openId = sessionKeyOropenid.getString("openid");
         String sessionKey = sessionKeyOropenid.getString("session_key");
-        if(StringUtils.isBlank(openId)||StringUtils.isBlank(sessionKey)){
+        if(StringUtils.isBlank(openId)|| StringUtils.isBlank(sessionKey)){
+            log.error("openId:{}, sessionKey:{}", openId, sessionKey);
             throw BusinessException.operate("参数无效");
         }
-
+        
         // 获取微信用户信息
         WxUserInfo userInfo = WxAppletUtils.getUserInfo(wxLoginDTO.getEncryptedData(), sessionKey, wxLoginDTO.getIv());
+        log.info("解密微信用户授权信息:{}", userInfo);
 
-        return null;
+        // 通过openID查询用户信息
+        RainMember rainMember = rainMemberDao.findByWxOpenId(openId);
+        if(rainMember == null){
+            // 注册用户
+            this.registerMember(openId, userInfo);
+        }
+
+        if(!rainMember.getStatus().equals(StateConstants.STATE_ENABLE)){
+            throw BusinessException.operate("账号不可用");
+        }
+        // 获取 access_token 和 refresh_token
+        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(UserTypeEnum.C_USER.getValue(), userInfo.getPhoneNumber(), "", false));
+        return loginSuccessVO;
+    }
+
+    /**
+     * 初始化会员账号
+     * @param wxOpenId
+     * @param wxUserInfo
+     * @return
+     */
+    private RainMember registerMember(String wxOpenId, WxUserInfo wxUserInfo){
+        String userName = RandomUtils.randomStringWithTime(6, DateFormatEnum.FORMAT_CONNECT_EXTEND.getFormatString());
+        Long memberId = TwiterIdUtil.getTwiterId();
+        Date now = new Date();
+        RainMember rainMember = new RainMember();
+        rainMember.setId(memberId);
+        rainMember.setUserName(userName);
+        rainMember.setPhone(wxUserInfo.getPhoneNumber());
+        // 初始密码为 "" 的加密串
+        rainMember.setPassword(UserCommonConstant.DEFAULT_PWD);
+        rainMember.setNickname(userName);
+        rainMember.setWxOpenid(wxOpenId);
+        rainMember.setWxNickname(wxUserInfo.getNickName());
+        rainMember.setEmail("");
+        rainMember.setAvatar(wxUserInfo.getAvatarUrl());
+        rainMember.setGender(wxUserInfo.getGender().equals("男") ? 1 : 2);
+        rainMember.setStatus(StateConstants.STATE_ENABLE);
+        rainMember.setPersonalSignature("");
+        rainMember.setBirthday(now);
+        rainMember.setCreateTime(now);
+        rainMember.setUpdateTime(now);
+        rainMemberDao.insert(rainMember);
+        // 设置用户注册缓存，有效时间为 1 分钟
+        String userRegisterCacheKey = UserCacheKey.userRegisterCacheKey(memberId);
+        redisTemplateUtils.set(userRegisterCacheKey, String.valueOf(memberId), CacheConstant.TIME_ONE);
+        // 调用支付系统初始化用户钱包
+        memberWalletClient.init(memberId);
+        return rainMember;
     }
 
     /**

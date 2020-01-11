@@ -1,7 +1,7 @@
 server:
-  port: 8086
+  port: 8090
   servlet:
-    context-path: /auth
+    context-path: /payment
     tomcat:
       uri-encoding: utf-8
 
@@ -14,7 +14,7 @@ spring:
     active: test
   # eureka 注册名称
   application:
-    name: rain-auth
+    name: rain-payment
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
@@ -26,9 +26,28 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
-# dao 的日志        
+# 通用 mapper
+mapper:
+  mappers: com.rao.mapper.RainBaseDao
+  identity: MYSQL
+
+# pagehelper
+pagehelper:
+  helperDialect: mysql
+  reasonable: false
+  supportMethodsArguments: true
+  params: count=countSql
+  returnPageInfo: check
+
+# dao 的日志
 logging:
   level:
     com:
       rao:
         dao: debug
+
+# 开启断路器
+feign:
+  hystrix:
+    enabled: true
+
