@@ -14,6 +14,6 @@ public interface SmsCodeService {
      * @param smsSendDTO
      * @return
      */
-    String sendCode(SmsSendDTO smsSendDTO);
+    void sendCode(SmsSendDTO smsSendDTO);
     
 }

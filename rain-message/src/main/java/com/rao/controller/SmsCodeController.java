@@ -31,8 +31,8 @@ public class SmsCodeController {
      */
     @PostMapping("/send_code")
     public ResultMessage<String> sendCode(@BeanValid @RequestBody SmsSendDTO smsSendDTO){
-        String msgCode = smsCodeService.sendCode(smsSendDTO);
-        return ResultMessage.success(msgCode).message("短信发送成功");
+        smsCodeService.sendCode(smsSendDTO);
+        return ResultMessage.success().message("短信发送成功");
     }
     
 }

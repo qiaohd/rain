@@ -23,7 +23,7 @@ public class SmsCodeServiceImpl implements SmsCodeService {
     private RedisTemplateUtils redisTemplateUtils;
     
     @Override
-    public String sendCode(SmsSendDTO smsSendDTO) {
+    public void sendCode(SmsSendDTO smsSendDTO) {
         /**
          * 用户在点发送短信验证码之前，需要通过手机号码做检验账号是否存在，是否锁定等操作
          * 此处不做账户的校验，直接发送短信
@@ -39,7 +39,6 @@ public class SmsCodeServiceImpl implements SmsCodeService {
         String msgCode = "123456";
         // 设置两分钟的过期时间
         redisTemplateUtils.set(cacheKey, msgCode, CacheConstant.TIME_TWO);
-        return msgCode;
     }
 
     /**
