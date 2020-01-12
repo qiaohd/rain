@@ -28,6 +28,11 @@ spring:
         predicates:
           - Path=/resource/**
 
+      - id: rain-storage
+        uri: lb://rain-storage
+        predicates:
+          - Path=/storage/**
+
       - id: rain-user
         uri: lb://rain-user
         predicates:
@@ -57,7 +62,7 @@ spring:
         uri: lb://rain-payment
         predicates:
           - Path=/payment/**
-          
+
 management:
   endpoint:
     conditions:
