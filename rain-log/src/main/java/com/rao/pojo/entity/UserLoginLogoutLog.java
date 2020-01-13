@@ -99,4 +99,10 @@ public class UserLoginLogoutLog {
     @Column(name = "user_type")
     private String userType;
 
+    /**
+     * 微信openID
+     */
+    @Column(name = "wx_openid")
+    private String wxOpenid;
+
 }

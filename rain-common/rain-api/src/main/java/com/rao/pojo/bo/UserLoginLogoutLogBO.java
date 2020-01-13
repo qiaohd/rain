@@ -78,4 +78,9 @@ public class UserLoginLogoutLogBO {
      * 发送时间
      */
     private Date sendTime;
+
+    /**
+     * 微信openID
+     */
+    private String wxOpenid;
 }

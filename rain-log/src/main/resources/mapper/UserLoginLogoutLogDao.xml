@@ -18,15 +18,18 @@
         <result property="area" column="area" />
         <result property="isp" column="isp" />
         <result property="createTime" column="create_time" />
+        <result property="userType" column="user_type" />
+        <result property="wxOpenid" column="wx_openid" />
+
     </resultMap>
 
     <!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
     <sql id="base_column">
-		 id ,user_id ,user_name ,phone ,type ,ip ,country ,province ,city ,area ,isp ,create_time
+		 id ,user_id ,user_name ,phone ,type ,ip ,country ,province ,city ,area ,isp ,create_time ,user_type ,wxOpenid
 	</sql>
 
     <sql id="base_value_column">
-		 #{id},#{userId},#{userName},#{phone},#{type},#{ip},#{country},#{province},#{city},#{area},#{isp},#{createTime}
+		 #{id},#{userId},#{userName},#{phone},#{type},#{ip},#{country},#{province},#{city},#{area},#{isp},#{createTime},#{user_type},#{wxOpenid}
 	</sql>
 
 </mapper>
