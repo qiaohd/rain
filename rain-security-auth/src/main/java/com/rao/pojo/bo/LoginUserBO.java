@@ -26,6 +26,11 @@ public class LoginUserBO {
     private String phone;
 
     /**
+     * 微信openID
+     */
+    private String wxOpenid;
+
+    /**
      * 密码
      */
     private String password;

@@ -64,6 +64,7 @@ public class LoginLogoutProducer {
         userLoginLogoutLogBO.setUserName(currentUserInfo.getUserName());
         userLoginLogoutLogBO.setPhone(currentUserInfo.getPhone());
         userLoginLogoutLogBO.setUserType(currentUserInfo.getUserType());
+        userLoginLogoutLogBO.setWxOpenid(currentUserInfo.getWxOpenid());
         userLoginLogoutLogBO.setType(operationType.getValue());
         userLoginLogoutLogBO.setSendTime(new Date());
         rocketMQTemplate.convertAndSend(LOG_TOPIC, userLoginLogoutLogBO);
@@ -83,6 +84,7 @@ public class LoginLogoutProducer {
         userLoginLogoutLogBO.setUserName(userExtend.getName());
         userLoginLogoutLogBO.setPhone(userExtend.getPhone());
         userLoginLogoutLogBO.setUserType(userExtend.getUserType());
+        userLoginLogoutLogBO.setWxOpenid(userExtend.getWxOpenid());
         return userLoginLogoutLogBO;
     }
 

@@ -35,6 +35,11 @@ public class UserExtend extends User {
     private String phone;
 
     /**
+     * 微信openID(扩展字段)
+     */
+    private String wxOpenid;
+    
+    /**
      * 昵称（扩展字段）
      */
     private String nickName;
@@ -69,6 +74,11 @@ public class UserExtend extends User {
 
     public UserExtend phone(String phone) {
         this.phone = phone;
+        return this;
+    }
+
+    public UserExtend wxOpenid(String wxOpenid) {
+        this.wxOpenid = wxOpenid;
         return this;
     }
 

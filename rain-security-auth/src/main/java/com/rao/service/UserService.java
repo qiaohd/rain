@@ -18,7 +18,7 @@ public interface UserService {
      * @param type
      * @return
      */
-    LoginUserBO findByUserNameOrPhoneAndUserType(String userName, String type);
+    LoginUserBO findByAccountAndUserType(String userName, String type);
 
     /**
      * 通过openID，用户类型查询用户信息
@@ -31,10 +31,9 @@ public interface UserService {
     /**
      * 注册c端用户信息
      * @param wxOpenId
-     * @param wxUserInfo
      * @return
      */
-    RainMember registerMember(String wxOpenId, WxUserInfo wxUserInfo);
+    RainMember registerMember(String wxOpenId);
 
     /**
      * 检查账号状态

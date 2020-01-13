@@ -52,5 +52,5 @@ public interface RainMemberDao {
      * @param account
      * @return
      */
-    RainMember findByUserNameOrPhone(@Param("account") String account);
+    RainMember findByUserNameOrPhoneOrOpenId(@Param("account") String account);
 }

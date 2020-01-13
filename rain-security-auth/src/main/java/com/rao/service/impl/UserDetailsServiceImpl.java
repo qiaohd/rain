@@ -53,7 +53,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userName = userType[1];
 
         // 通过用户名或手机号码，用户类型查询用户信息
-        LoginUserBO loginUser = userService.findByUserNameOrPhoneAndUserType(userName, type);
+        LoginUserBO loginUser = userService.findByAccountAndUserType(userName, type);
         if (loginUser != null) {
             // 如果用户不是密码登录，修改被security管理的用户密码为 "" 加密串
             String pwdLogin = request.getParameter("pwdLogin");
@@ -84,6 +84,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     .id(loginUser.getId())
                     .name(loginUser.getUserName())
                     .phone(loginUser.getPhone())
+                    .wxOpenid(loginUser.getWxOpenid())
                     .nickName(loginUser.getNickName())
                     .email(loginUser.getEmail())
                     .type(type);

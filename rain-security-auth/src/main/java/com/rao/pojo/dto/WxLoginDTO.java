@@ -19,18 +19,6 @@ public class WxLoginDTO {
     private String code;
 
     /**
-     * encryptedData
-     */
-    @NotBlank(message = "encryptedData不能为空")
-    private String encryptedData;
-
-    /**
-     * iv
-     */
-    @NotBlank(message = "iv不能为空")
-    private String iv;
-
-    /**
      * 账号类型
      */
     @NotBlank(message = "账号类型不能为空")

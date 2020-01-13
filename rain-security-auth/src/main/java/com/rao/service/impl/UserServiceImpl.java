@@ -9,7 +9,6 @@ import com.rao.constant.user.UserCommonConstant;
 import com.rao.constant.user.UserTypeEnum;
 import com.rao.dao.RainMemberDao;
 import com.rao.dao.RainSystemUserDao;
-import com.rao.dto.WxUserInfo;
 import com.rao.exception.BusinessException;
 import com.rao.exception.DefaultSuccessMsgEnum;
 import com.rao.pojo.bo.LoginUserBO;
@@ -46,7 +45,7 @@ public class UserServiceImpl implements UserService {
     private MemberWalletClient memberWalletClient;
 
     @Override
-    public LoginUserBO findByUserNameOrPhoneAndUserType(String userName, String type) {
+    public LoginUserBO findByAccountAndUserType(String userName, String type) {
         LoginUserBO loginUser = null;
         if(UserTypeEnum.ADMIN.getValue().equals(type)){
             // 系统管理员用户
@@ -57,7 +56,7 @@ public class UserServiceImpl implements UserService {
             }
         }else if(UserTypeEnum.C_USER.getValue().equals(type)){
             // C 端用户
-            RainMember member = rainMemberDao.findByUserNameOrPhone(userName);
+            RainMember member = rainMemberDao.findByUserNameOrPhoneOrOpenId(userName);
             if(member != null){
                 loginUser = new LoginUserBO();
                 BeanUtils.copyProperties(member, loginUser);
@@ -84,7 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RainMember registerMember(String wxOpenId, WxUserInfo wxUserInfo) {
+    public RainMember registerMember(String wxOpenId) {
         /**
          * 调用支付系统初始化用户钱包
          */
@@ -106,15 +105,15 @@ public class UserServiceImpl implements UserService {
         RainMember rainMember = new RainMember();
         rainMember.setId(memberId);
         rainMember.setUserName(userName);
-        rainMember.setPhone(wxUserInfo.getPhoneNumber());
+        rainMember.setPhone("");
         // 初始密码为 "" 的加密串
         rainMember.setPassword(UserCommonConstant.DEFAULT_PWD);
         rainMember.setNickname(userName);
         rainMember.setWxOpenid(wxOpenId);
-        rainMember.setWxNickname(wxUserInfo.getNickName());
+        rainMember.setWxNickname("");
         rainMember.setEmail("");
-        rainMember.setAvatar(wxUserInfo.getAvatarUrl());
-        rainMember.setGender(wxUserInfo.getGender().equals("男") ? 1 : 2);
+        rainMember.setAvatar("");
+        rainMember.setGender(1);
         rainMember.setStatus(StateConstants.STATE_ENABLE);
         rainMember.setPersonalSignature("");
         rainMember.setBirthday(now);
@@ -128,7 +127,7 @@ public class UserServiceImpl implements UserService {
     public void checkAccount(SmsSendDTO smsSendDTO) {
         SmsOperationTypeEnum operationType = SmsOperationTypeEnum.ofType(smsSendDTO.getType());
         UserTypeEnum userType = UserTypeEnum.ofValue(smsSendDTO.getAccountType());
-        LoginUserBO userBO = this.findByUserNameOrPhoneAndUserType(smsSendDTO.getPhone(), userType.getValue());
+        LoginUserBO userBO = this.findByAccountAndUserType(smsSendDTO.getPhone(), userType.getValue());
         switch (operationType){
             case LOGIN:
                 // 登录

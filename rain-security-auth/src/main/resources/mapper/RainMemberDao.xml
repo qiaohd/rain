@@ -304,11 +304,12 @@
 	</select>
 
 	<!-- 通过用户名或手机号码查询用户信息 -->
-    <select id="findByUserNameOrPhone" resultType="com.rao.pojo.entity.RainMember">
+    <select id="findByUserNameOrPhoneOrOpenId" resultType="com.rao.pojo.entity.RainMember">
 		SELECT <include refid="base_column" />
 		FROM RAIN_MEMBER
 		where user_name = #{account,jdbcType=VARCHAR}
 		or phone = #{account,jdbcType=VARCHAR}
+		or wx_openid = #{account,jdbcType=VARCHAR}
 	</select>
 
 </mapper> 

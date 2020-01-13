@@ -10,7 +10,6 @@ import com.rao.constant.user.LoginSettingEnum;
 import com.rao.constant.user.OperationTypeEnum;
 import com.rao.constant.user.UserCommonConstant;
 import com.rao.constant.user.UserTypeEnum;
-import com.rao.dto.WxUserInfo;
 import com.rao.exception.BusinessException;
 import com.rao.pojo.bo.LoginUserBO;
 import com.rao.pojo.bo.OauthTokenResponse;
@@ -78,7 +77,7 @@ public class LoginServiceImpl implements LoginService {
 
         // 校验用户
         String userName = passwordLoginDTO.getUsername();
-        LoginUserBO loginUserBO = userService.findByUserNameOrPhoneAndUserType(userName, accountType);
+        LoginUserBO loginUserBO = userService.findByAccountAndUserType(userName, accountType);
         if (loginUserBO == null) {
             throw BusinessException.operate("账号不存在");
         } else {
@@ -93,7 +92,7 @@ public class LoginServiceImpl implements LoginService {
         // 获取 access_token
         LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(accountType, userName, passwordLoginDTO.getPassword(), true));
         //发送登录日志
-        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
+        UserLoginLogoutLogBO userLoginLogoutLogBO = CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
         userLoginLogoutLogBO.setUserId(loginUserBO.getId());
         userLoginLogoutLogBO.setUserType(accountType);
         loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_PWD);
@@ -109,7 +108,7 @@ public class LoginServiceImpl implements LoginService {
         // 通过手机号码查询用户信息并校验
         String phone = smsCodeLoginDTO.getPhone();
         String smsCode = smsCodeLoginDTO.getSmsCode();
-        LoginUserBO loginUserBO = userService.findByUserNameOrPhoneAndUserType(phone, accountType);
+        LoginUserBO loginUserBO = userService.findByAccountAndUserType(phone, accountType);
         if(loginUserBO == null || !loginUserBO.getStatus().equals(StateConstants.STATE_ENABLE)){
             throw BusinessException.operate("账号不存在或不可用");
         }
@@ -125,7 +124,7 @@ public class LoginServiceImpl implements LoginService {
         // 获取 access_token 和 refresh_token
         LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(accountType, phone, "", false));
         //发送登录日志
-        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
+        UserLoginLogoutLogBO userLoginLogoutLogBO = CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
         userLoginLogoutLogBO.setUserId(loginUserBO.getId());
         userLoginLogoutLogBO.setUserType(accountType);
         loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_SMS_CODE);
@@ -149,15 +148,13 @@ public class LoginServiceImpl implements LoginService {
             log.error("openId:{}, sessionKey:{}", openId, sessionKey);
             throw BusinessException.operate("参数无效");
         }
-        WxUserInfo userInfo = WxAppletUtils.getUserInfo(wxLoginDTO.getEncryptedData(), sessionKey, wxLoginDTO.getIv());
-        log.info("解密微信用户授权信息:{}", userInfo);
-
+        
         // 通过openID查询用户信息
         LoginUserBO loginUserBO = userService.findByOpenIdAndUserType(openId, accountType);
         if(loginUserBO == null){
             if(accountType.equals(UserTypeEnum.C_USER.getValue())){
                 // 注册用户
-                userService.registerMember(openId, userInfo);
+                userService.registerMember(openId);
             }else{
                 throw BusinessException.operate("账号不存在");
             }
@@ -167,10 +164,11 @@ public class LoginServiceImpl implements LoginService {
             throw BusinessException.operate("账号不可用");
         }
         // 获取 access_token 和 refresh_token
-        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(accountType, userInfo.getPhoneNumber(), "", false));
+        LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(accountType, openId, "", false));
         //发送登录日志
-        UserLoginLogoutLogBO userLoginLogoutLogBO= CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
+        UserLoginLogoutLogBO userLoginLogoutLogBO = CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
         userLoginLogoutLogBO.setUserId(loginUserBO.getId());
+        userLoginLogoutLogBO.setWxOpenid(openId);
         userLoginLogoutLogBO.setUserType(accountType);
         loginLogoutProducer.sendLogMsg(userLoginLogoutLogBO, OperationTypeEnum.LOG_IN_WX);
         return loginSuccessVO;
