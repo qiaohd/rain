@@ -8,17 +8,13 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.util.StringUtils;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.*;
-import java.security.spec.InvalidParameterSpecException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,6 +26,14 @@ import java.util.Map;
  * @date 2020/1/6 15:45
  */
 public class WxAppletUtils {
+    
+    private final static String REQUEST_URL = "https://api.weixin.qq.com/sns/jscode2session";
+    
+    private final static String APPID = "wx50fb244113824503";
+    
+    private final static String APP_SECRET = "19bd02121d4e2e39cbcc4898f3fc3b1c";
+    
+    private final static String GRANT_TYPE = "authorization_code";
 
     /**
      * 获取微信小程序 session_key 和 openid
@@ -39,21 +43,16 @@ public class WxAppletUtils {
      */
     public static JSONObject getSessionKeyOropenid(String code) {
         //微信端登录code值
-        String requestUrl = "https://api.weixin.qq.com/sns/jscode2session";
-        String appId = "wxec5f0e6389a02a23";
-        String appSecret = "1304a531102040177d5465d19162f062";
-        String grantType = "authorization_code";
-
         Map<String, String> requestUrlParam = new HashMap<String, String>();
         // 开发者设置中的appId
-        requestUrlParam.put("appid", appId);
+        requestUrlParam.put("appid", APPID);
         // 开发者设置中的appSecret
-        requestUrlParam.put("secret", appSecret);
+        requestUrlParam.put("secret", APP_SECRET);
         // //小程序调用wx.login返回的code
         requestUrlParam.put("js_code", code);
         // //默认参数-授权码模式 authorization_code
-        requestUrlParam.put("grant_type", grantType);
-        JSONObject jsonObject = JSON.parseObject(sendPost(requestUrl, requestUrlParam));
+        requestUrlParam.put("grant_type", GRANT_TYPE);
+        JSONObject jsonObject = JSON.parseObject(sendPost(REQUEST_URL, requestUrlParam));
         return jsonObject;
     }
 

@@ -16,7 +16,7 @@ import com.rao.pojo.vo.user.SystemUserVO;
 import com.rao.pojo.vo.user.UserRoleListVO;
 import com.rao.pojo.vo.user.UserRoleVO;
 import com.rao.service.user.SystemUserService;
-import com.rao.util.CopyUtil;
+import com.rao.util.common.CopyUtil;
 import com.rao.util.common.TwiterIdUtil;
 import com.rao.util.page.PageParam;
 import com.rao.util.result.PageResult;

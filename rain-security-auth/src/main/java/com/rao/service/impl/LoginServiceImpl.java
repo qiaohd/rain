@@ -22,7 +22,7 @@ import com.rao.pojo.dto.WxLoginDTO;
 import com.rao.pojo.vo.LoginSuccessVO;
 import com.rao.service.LoginService;
 import com.rao.service.UserService;
-import com.rao.util.CopyUtil;
+import com.rao.util.common.CopyUtil;
 import com.rao.util.cache.RedisTemplateUtils;
 import com.rao.util.wx.WxAppletUtils;
 import lombok.extern.slf4j.Slf4j;

@@ -4,7 +4,7 @@ import com.rao.constant.user.OperationTypeEnum;
 import com.rao.dto.IpInfo;
 import com.rao.pojo.bo.UserExtend;
 import com.rao.pojo.bo.UserLoginLogoutLogBO;
-import com.rao.util.CopyUtil;
+import com.rao.util.common.CopyUtil;
 import com.rao.util.common.UserAgentUtils;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.security.core.Authentication;

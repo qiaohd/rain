@@ -14,7 +14,7 @@ import com.rao.pojo.vo.system.ListRoleVO;
 import com.rao.pojo.vo.system.PageRoleVO;
 import com.rao.pojo.vo.system.RoleDetailVO;
 import com.rao.service.system.RoleService;
-import com.rao.util.CopyUtil;
+import com.rao.util.common.CopyUtil;
 import com.rao.util.common.TwiterIdUtil;
 import com.rao.util.page.PageParam;
 import com.rao.util.result.PageResult;

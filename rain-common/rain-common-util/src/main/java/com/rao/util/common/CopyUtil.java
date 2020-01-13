@@ -1,4 +1,4 @@
-package com.rao.util;
+package com.rao.util.common;
 
 import com.rao.exception.BusinessException;
 import org.springframework.beans.BeanUtils;

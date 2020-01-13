@@ -9,7 +9,7 @@ import com.rao.pojo.entity.system.RainUserRole;
 import com.rao.pojo.entity.user.RainSystemUser;
 import com.rao.pojo.vo.user.UserInfoVO;
 import com.rao.pojo.vo.user.UserRoleVO;
-import com.rao.util.CopyUtil;
+import com.rao.util.common.CopyUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
