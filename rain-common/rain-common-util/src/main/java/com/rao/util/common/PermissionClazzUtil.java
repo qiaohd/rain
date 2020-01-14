@@ -2,12 +2,10 @@ package com.rao.util.common;
 
 import com.rao.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * @author raojing
@@ -20,9 +18,10 @@ public class PermissionClazzUtil {
     
     static {
         try {
-            clazzList.add(Class.forName("com.rao.constant.permission.user.SystemCodeConstant"));
-            clazzList.add(Class.forName("com.rao.constant.permission.user.UserCodeConstant"));
-            clazzList.add(Class.forName("com.rao.constant.permission.quartz.QuartzCodeConstant"));
+            Set<String> packageClass = PackageScanUtil.findPackageClass("com.rao.constant.permission");
+            for (String aClass : packageClass) {
+                clazzList.add(Class.forName(aClass));
+            }
         } catch (Exception e) {
             log.error("加载类异常--->{}", e.getMessage());
             throw BusinessException.operate("加载类异常");
