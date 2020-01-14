@@ -1,6 +1,5 @@
 package com.rao.service;
 
-import com.rao.pojo.dto.UserLoginLogoutLogDTO;
 import com.rao.pojo.vo.UserLoginLogoutLogVO;
 import com.rao.util.page.PageParam;
 import com.rao.util.result.PageResult;
@@ -16,8 +15,9 @@ public interface UserLogService {
     /**
      * 用户登录登出日志分页
      * @param pageParam
-     * @param userLoginLogoutLogDTO
+     * @param userId
+     * @param accountType
      * @return
      */
-    PageResult<UserLoginLogoutLogVO> getLoginLogout(PageParam pageParam, UserLoginLogoutLogDTO userLoginLogoutLogDTO);
+    PageResult<UserLoginLogoutLogVO> getLoginLogout(PageParam pageParam, Long userId, String accountType);
 }

@@ -2,8 +2,8 @@ package com.rao.service.Impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rao.constant.user.UserTypeEnum;
 import com.rao.dao.UserLoginLogoutLogDao;
-import com.rao.pojo.dto.UserLoginLogoutLogDTO;
 import com.rao.pojo.entity.UserLoginLogoutLog;
 import com.rao.pojo.vo.UserLoginLogoutLogVO;
 import com.rao.service.UserLogService;
@@ -29,13 +29,14 @@ public class UserLogServiceImpl implements UserLogService {
     private UserLoginLogoutLogDao userLoginLogoutLogDao;
 
     @Override
-    public PageResult<UserLoginLogoutLogVO> getLoginLogout(PageParam pageParam, UserLoginLogoutLogDTO userLoginLogoutLogDTO) {
+    public PageResult<UserLoginLogoutLogVO> getLoginLogout(PageParam pageParam, Long userId, String accountType) {
+        UserTypeEnum userType = UserTypeEnum.ofValue(accountType);
         PageHelper.startPage(pageParam.getPageNumber(), pageParam.getPageSize());
 
         //添加查询条件
         Example example = new Example(UserLoginLogoutLog.class);
-        example.createCriteria().andEqualTo("userId", userLoginLogoutLogDTO.getUserId());
-        example.and().andEqualTo("userType",userLoginLogoutLogDTO.getAccountType());
+        example.createCriteria().andEqualTo("userId", userId);
+        example.and().andEqualTo("userType", userType.getValue());
 
         List<UserLoginLogoutLog> systemUserList = userLoginLogoutLogDao.selectByExample(example);
         PageInfo pageInfo = PageInfo.of(systemUserList);
