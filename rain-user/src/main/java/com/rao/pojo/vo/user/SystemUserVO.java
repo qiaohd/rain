@@ -1,5 +1,7 @@
 package com.rao.pojo.vo.user;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 import java.util.Date;
@@ -13,6 +15,12 @@ import java.util.List;
  */
 @Data
 public class SystemUserVO {
+
+    /**
+     * 用户id
+     */
+    @JsonSerialize(using= ToStringSerializer.class)
+    private Long id;
 
     /**
      * 用户名
@@ -38,6 +46,11 @@ public class SystemUserVO {
      * 头像
      */
     private String avatar;
+
+    /**
+     * 状态 1-启用 2-禁用 3-锁定 4-删除
+     */
+    private Integer status;
 
     /**
      * 注册时间
