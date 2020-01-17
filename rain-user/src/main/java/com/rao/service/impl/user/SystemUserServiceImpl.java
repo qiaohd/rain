@@ -2,6 +2,7 @@ package com.rao.service.impl.user;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rao.constant.common.StateConstants;
 import com.rao.dao.system.RainRoleDao;
 import com.rao.dao.system.RainUserRoleDao;
 import com.rao.dao.user.RainSystemUserDao;
@@ -80,17 +81,22 @@ public class SystemUserServiceImpl implements SystemUserService {
 
         //判断用户名是否已经存在
         String userName = systemUser.getUserName();
-        Example countExample = new Example(RainPermission.class);
+        Example countExample = new Example(RainSystemUser.class);
         countExample.createCriteria().andEqualTo("userName", userName);
         int count = rainSystemUserDao.selectCountByExample(countExample);
 
         if (count > 0) {
-            throw BusinessException.operate(userName + "已存在");
+            throw BusinessException.operate("用户已存在");
         }
         //保存系统用户信息
         Date now = new Date();
         Long userId = TwiterIdUtil.getTwiterId();
         systemUser.setId(userId);
+        systemUser.setPassword(passwordEncoder.encode(systemUserDTO.getPassword()));
+        systemUser.setNickName("");
+        systemUser.setEmail("");
+        systemUser.setAvatar("");
+        systemUser.setStatus(StateConstants.STATE_ENABLE);
         systemUser.setCreateTime(now);
         systemUser.setUpdateTime(now);
         rainSystemUserDao.insertSelective(systemUser);
@@ -104,7 +110,7 @@ public class SystemUserServiceImpl implements SystemUserService {
                     .userId(userId)
                     .build();
         }).collect(Collectors.toList());
-        userRoleDao.batchSaveRelation(userRoleList);
+        userRoleDao.insertList(userRoleList);
     }
 
     @Override
