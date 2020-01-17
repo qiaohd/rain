@@ -3,9 +3,11 @@ package com.rao.service.user;
 import com.rao.pojo.dto.SaveSystemUserDTO;
 import com.rao.pojo.vo.user.SystemUserDetailVO;
 import com.rao.pojo.vo.user.SystemUserVO;
-import com.rao.pojo.vo.user.UserRoleListVO;
+import com.rao.pojo.vo.user.UserRoleVO;
 import com.rao.util.page.PageParam;
 import com.rao.util.result.PageResult;
+
+import java.util.List;
 
 /**
  * @ClassName : SystemUserService  //类名
@@ -95,5 +97,5 @@ public interface SystemUserService {
      * @param id
      * @return
      */
-    UserRoleListVO userRoles(Long id);
+    List<UserRoleVO> userRoles(Long id);
 }

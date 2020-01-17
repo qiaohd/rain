@@ -2,12 +2,11 @@ package com.rao.controller.user;
 
 import com.rao.annotation.BeanValid;
 import com.rao.annotation.SimpleValid;
-import com.rao.constant.permission.user.SystemCodeConstant;
 import com.rao.constant.permission.user.UserCodeConstant;
 import com.rao.pojo.dto.SaveSystemUserDTO;
 import com.rao.pojo.vo.user.SystemUserDetailVO;
 import com.rao.pojo.vo.user.SystemUserVO;
-import com.rao.pojo.vo.user.UserRoleListVO;
+import com.rao.pojo.vo.user.UserRoleVO;
 import com.rao.service.user.SystemUserService;
 import com.rao.util.page.PageParam;
 import com.rao.util.result.PageResult;
@@ -19,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 系统用户管理
@@ -135,8 +135,8 @@ public class SystemUserManagerController {
      */
     @GetMapping("/roles/{id}")
     @PreAuthorize("hasAuthority('" + UserCodeConstant.ADMIN_SYSTEM_USER_ROLE_LIST + "')")
-    public ResultMessage<UserRoleListVO> userRoles(@PathVariable("id") Long id){
-        UserRoleListVO userRoleListVO =systemUserService.userRoles(id);
+    public ResultMessage<List<UserRoleVO>> userRoles(@PathVariable("id") Long id){
+        List<UserRoleVO> userRoleListVO =systemUserService.userRoles(id);
         return ResultMessage.success(userRoleListVO);
     }
 

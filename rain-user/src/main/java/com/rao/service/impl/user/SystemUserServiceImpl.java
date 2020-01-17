@@ -13,7 +13,6 @@ import com.rao.pojo.entity.system.RainUserRole;
 import com.rao.pojo.entity.user.RainSystemUser;
 import com.rao.pojo.vo.user.SystemUserDetailVO;
 import com.rao.pojo.vo.user.SystemUserVO;
-import com.rao.pojo.vo.user.UserRoleListVO;
 import com.rao.pojo.vo.user.UserRoleVO;
 import com.rao.service.user.SystemUserService;
 import com.rao.util.common.CopyUtil;
@@ -68,17 +67,7 @@ public class SystemUserServiceImpl implements SystemUserService {
     public SystemUserDetailVO findSystemUserById(Long id) {
         RainSystemUser rainSystemUser = rainSystemUserDao.selectByPrimaryKey(id);
         SystemUserDetailVO systemUserDetailVO = CopyUtil.transToObj(rainSystemUser, SystemUserDetailVO.class);
-
-        //查询用户下的角色
-        Example userRoleExample = new Example(RainUserRole.class);
-        userRoleExample.createCriteria().andEqualTo("userId", id);
-        List<RainUserRole> userRoleList = userRoleDao.selectByExample(userRoleExample);
-
-        //查询关联表
-
-        //封装用户角色信息
-        List<UserRoleVO> userRoleVOList = CopyUtil.transToObjList(userRoleList, UserRoleVO.class);
-        systemUserDetailVO.setUserRoleVOList(userRoleVOList);
+        systemUserDetailVO.setUserRoleVOList(userRoles(id));
         return systemUserDetailVO;
     }
 
@@ -141,7 +130,6 @@ public class SystemUserServiceImpl implements SystemUserService {
 
         //更新用户表的信息
         BeanUtils.copyProperties(systemUserDTO, rainSystemUser);
-//        passwordEncoder.matches()
         rainSystemUserDao.updateByPrimaryKeySelective(rainSystemUser);
 
         //删除用户旧的角色信息
@@ -186,7 +174,7 @@ public class SystemUserServiceImpl implements SystemUserService {
     }
 
     @Override
-    public UserRoleListVO userRoles(Long id) {
+    public List<UserRoleVO> userRoles(Long id) {
         //查询用户角色关联
         Example userRoleExample = new Example(RainUserRole.class);
         userRoleExample.createCriteria().andEqualTo("userId", id);
@@ -195,13 +183,11 @@ public class SystemUserServiceImpl implements SystemUserService {
 
         //查询角色
         if(!CollectionUtils.isEmpty(rainUserRoleList)){
-            userRoleExample = new Example(RainUserRole.class);
-            userRoleExample.createCriteria().andIn("id",rainUserRoleList.stream().map(item->item.getRoleId()).collect(Collectors.toList()));
-            List<RainRole> rainRoleList = rainRoleDao.selectByExample(userRoleExample);
+            List<Long> roleIds = rainUserRoleList.stream().map(item -> item.getRoleId()).collect(Collectors.toList());
+            List<RainRole> rainRoleList = rainRoleDao.findByRoleIdList(roleIds);
             List<UserRoleVO> userRoleVOList = CopyUtil.transToObjList(rainRoleList, UserRoleVO.class);
-            return UserRoleListVO.builder().roleList(userRoleVOList).build();
-        }else{
-            return UserRoleListVO.builder().roleList(new ArrayList<>()).build();
+            return userRoleVOList;
         }
+        return new ArrayList<>(0);
     }
 }
