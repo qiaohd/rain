@@ -37,6 +37,7 @@ public class UserLogServiceImpl implements UserLogService {
         Example example = new Example(UserLoginLogoutLog.class);
         example.createCriteria().andEqualTo("userId", userId);
         example.and().andEqualTo("userType", userType.getValue());
+        example.setOrderByClause("create_time desc");
 
         List<UserLoginLogoutLog> systemUserList = userLoginLogoutLogDao.selectByExample(example);
         PageInfo pageInfo = PageInfo.of(systemUserList);
