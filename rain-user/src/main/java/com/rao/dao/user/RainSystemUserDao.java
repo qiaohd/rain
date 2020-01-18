@@ -22,5 +22,14 @@ public interface RainSystemUserDao extends RainBaseDao<RainSystemUser> {
      * @return
      */
     RainSystemUser findByUserNameOrPhone(@Param("account") String account);
-    
+
+    /**
+     * 通过用户名和密码查询记录数
+     * @param userName
+     * @param phone
+     * @param id
+     * @return
+     */
+    Integer countByUserNameOrPhone(@Param("userName") String userName, @Param("phone") String phone, @Param("id") Long id);
+
 }

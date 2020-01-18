@@ -48,18 +48,7 @@ public interface SystemUserService {
      * @throws Exception
      * @return void
      */
-    void insertSystemUser(SaveSystemUserDTO systemUserDTO);
-
-    /**
-     *
-     * 根据id删除用户
-     * @param id
-     * @author xujianjie
-     * @date 2019/12/16 17:15
-     * @throws Exception
-     * @return void
-     */
-    void deleteUserById(Long id);
+    void addSystemUser(SaveSystemUserDTO systemUserDTO);
 
    /**
     * 修改系统用户
@@ -72,6 +61,16 @@ public interface SystemUserService {
     * @return void
     */
     void updateSystemUser(Long id,SaveSystemUserDTO systemUserDTO);
+
+    /**
+     * 根据id删除用户
+     * @param id
+     * @author xujianjie
+     * @date 2019/12/16 17:15
+     * @throws Exception
+     * @return void
+     */
+    void deleteUserById(Long id);
 
     /**
      * 修改用户的状态

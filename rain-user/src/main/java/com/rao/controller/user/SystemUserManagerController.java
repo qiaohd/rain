@@ -67,7 +67,7 @@ public class SystemUserManagerController {
     @PostMapping()
     @PreAuthorize("hasAuthority('" + UserCodeConstant.ADMIN_SYSTEM_USER_ADD + "')")
     public ResultMessage addUser(@BeanValid @RequestBody SaveSystemUserDTO systemUserDTO) {
-        systemUserService.insertSystemUser(systemUserDTO);
+        systemUserService.addSystemUser(systemUserDTO);
         return ResultMessage.success();
     }
 

@@ -13,5 +13,4 @@ import java.util.Map;
  */
 public interface RainUserRoleDao extends RainBaseDao<RainUserRole> {
 
-    void batchSaveRelation(List<RainUserRole> userRoleList);
 }

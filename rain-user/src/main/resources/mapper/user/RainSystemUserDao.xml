@@ -35,5 +35,15 @@
 		where user_name = #{account,jdbcType=VARCHAR}
 		or phone = #{account,jdbcType=VARCHAR}
 	</select>
-	
-</mapper> 
+
+	<!-- 通过用户名和密码查询记录数 -->
+    <select id="countByUserNameOrPhone" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM rain_system_user
+		WHERE (user_name = #{userName} OR phone = #{phone})
+		<if test="id != null">
+			AND id != #{id}
+		</if>
+	</select>
+
+</mapper>

@@ -20,7 +20,6 @@ import com.rao.util.common.CopyUtil;
 import com.rao.util.common.TwiterIdUtil;
 import com.rao.util.page.PageParam;
 import com.rao.util.result.PageResult;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,16 +39,14 @@ import java.util.stream.Collectors;
  * @Date: 2019-12-16 16:43  //时间
  */
 @Service
-
 public class SystemUserServiceImpl implements SystemUserService {
 
     @Resource
     private RainSystemUserDao rainSystemUserDao;
     @Resource
-    private RainUserRoleDao userRoleDao;
+    private RainUserRoleDao rainUserRoleDao;
     @Resource
-    private BCryptPasswordEncoder passwordEncoder;
-
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Resource
     private RainRoleDao rainRoleDao;
 
@@ -60,7 +57,6 @@ public class SystemUserServiceImpl implements SystemUserService {
         PageInfo pageInfo = PageInfo.of(systemUserList);
         // 封装视图模型
         List<SystemUserVO> systemUserVOList = CopyUtil.transToObjList(systemUserList, SystemUserVO.class);
-
         return PageResult.build(pageInfo.getTotal(), systemUserVOList);
     }
 
@@ -74,43 +70,77 @@ public class SystemUserServiceImpl implements SystemUserService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void insertSystemUser(SaveSystemUserDTO systemUserDTO) {
-
-        RainSystemUser systemUser = new RainSystemUser();
-        BeanUtils.copyProperties(systemUserDTO, systemUser);
-
+    public void addSystemUser(SaveSystemUserDTO systemUserDTO) {
         //判断用户名是否已经存在
-        String userName = systemUser.getUserName();
-        Example countExample = new Example(RainSystemUser.class);
-        countExample.createCriteria().andEqualTo("userName", userName);
-        int count = rainSystemUserDao.selectCountByExample(countExample);
-
+        String userName = systemUserDTO.getUserName();
+        String phone = systemUserDTO.getPhone();
+        int count = rainSystemUserDao.countByUserNameOrPhone(userName, phone, null);
         if (count > 0) {
-            throw BusinessException.operate("用户已存在");
+            throw BusinessException.operate("用户名或手机号码已存在");
         }
+
         //保存系统用户信息
         Date now = new Date();
         Long userId = TwiterIdUtil.getTwiterId();
+        RainSystemUser systemUser = new RainSystemUser();
         systemUser.setId(userId);
-        systemUser.setPassword(passwordEncoder.encode(systemUserDTO.getPassword()));
+        systemUser.setUserName(userName);
+        systemUser.setPhone(phone);
+        systemUser.setPassword(bCryptPasswordEncoder.encode(systemUserDTO.getPassword()));
         systemUser.setNickName("");
         systemUser.setEmail("");
         systemUser.setAvatar("");
         systemUser.setStatus(StateConstants.STATE_ENABLE);
         systemUser.setCreateTime(now);
         systemUser.setUpdateTime(now);
+        systemUser.setDeleteTime(now);
         rainSystemUserDao.insertSelective(systemUser);
 
-        List<Long> roleIds = systemUserDTO.getRoleId();
-
         //保存用户角色关系
-        List<RainUserRole> userRoleList = roleIds.stream().map(item -> {
+        List<RainUserRole> userRoleList = systemUserDTO.getRoleId().stream().map(item -> {
             return RainUserRole.builder()
                     .roleId(item)
                     .userId(userId)
                     .build();
         }).collect(Collectors.toList());
-        userRoleDao.insertList(userRoleList);
+        rainUserRoleDao.insertList(userRoleList);
+    }
+
+    @Override
+    public void updateSystemUser(Long id, SaveSystemUserDTO systemUserDTO) {
+        // 查询用户信息
+        RainSystemUser rainSystemUser = rainSystemUserDao.selectByPrimaryKey(id);
+        if (null == rainSystemUser) {
+            throw BusinessException.operate("用户不存在");
+        }
+        // 修改用户信息，需要对用户名和手机号码进行校验
+        String userName = systemUserDTO.getUserName();
+        String phone = systemUserDTO.getPhone();
+        int count = rainSystemUserDao.countByUserNameOrPhone(userName, phone, id);
+        if(count > 0){
+            throw BusinessException.operate("用户名或手机号码已存在");
+        }
+        // 保存用户信息
+        RainSystemUser updateUser = new RainSystemUser();
+        updateUser.setId(id);
+        updateUser.setUserName(userName);
+        updateUser.setPhone(phone);
+        updateUser.setPassword(bCryptPasswordEncoder.encode(systemUserDTO.getPassword()));
+        rainSystemUserDao.updateByPrimaryKeySelective(updateUser);
+
+        //删除用户旧的角色信息
+        Example userRoleExample = new Example(RainPermission.class);
+        userRoleExample.createCriteria().andEqualTo("userId", id);
+        rainUserRoleDao.deleteByExample(userRoleExample);
+
+        //保存新的角色信息
+        List<RainUserRole> userRoleList = systemUserDTO.getRoleId().stream().map(item -> {
+            return RainUserRole.builder()
+                    .roleId(item)
+                    .userId(id)
+                    .build();
+        }).collect(Collectors.toList());
+        rainUserRoleDao.insertList(userRoleList);
     }
 
     @Override
@@ -119,52 +149,26 @@ public class SystemUserServiceImpl implements SystemUserService {
         if (null == rainSystemUser) {
             throw BusinessException.operate(id + "不存在");
         }
-        RainSystemUser user=new RainSystemUser();
-        user.setId(id);
-        user.setStatus(4);
-        user.setDeleteTime(new Date());
-        rainSystemUserDao.updateByPrimaryKeySelective(user);
-    }
-
-    @Override
-    public void updateSystemUser(Long id, SaveSystemUserDTO systemUserDTO) {
-
-        RainSystemUser rainSystemUser = rainSystemUserDao.selectByPrimaryKey(id);
-        if (null == rainSystemUser) {
-            throw BusinessException.operate(id + "不存在");
-        }
-
-        //更新用户表的信息
-        BeanUtils.copyProperties(systemUserDTO, rainSystemUser);
-        rainSystemUserDao.updateByPrimaryKeySelective(rainSystemUser);
-
-        //删除用户旧的角色信息
-        Example userRoleExample = new Example(RainPermission.class);
-        userRoleExample.createCriteria().andEqualTo("userId", id);
-        userRoleDao.deleteByExample(userRoleExample);
-
-        //保存信息角色信息
-        List<RainUserRole> userRoleList = systemUserDTO.getRoleId().stream().map(item -> {
-            return RainUserRole.builder()
-                    .roleId(item)
-                    .userId(id)
-                    .build();
-        }).collect(Collectors.toList());
-        userRoleDao.batchSaveRelation(userRoleList);
+        RainSystemUser updateUser=new RainSystemUser();
+        updateUser.setId(id);
+        updateUser.setStatus(StateConstants.STATE_DELETE);
+        updateUser.setDeleteTime(new Date());
+        rainSystemUserDao.updateByPrimaryKeySelective(updateUser);
     }
 
     @Override
     public void updateUserStatus(Long id, Integer status) {
-
         RainSystemUser rainSystemUser = rainSystemUserDao.selectByPrimaryKey(id);
         if (null == rainSystemUser) {
             throw BusinessException.operate(id + "不存在");
         }
 
         //更新用户表的信息
-        rainSystemUser.setStatus(status);
-        rainSystemUser.setUpdateTime(new Date());
-        rainSystemUserDao.updateByPrimaryKeySelective(rainSystemUser);
+        RainSystemUser updateUser=new RainSystemUser();
+        updateUser.setId(id);
+        updateUser.setStatus(status);
+        updateUser.setUpdateTime(new Date());
+        rainSystemUserDao.updateByPrimaryKeySelective(updateUser);
     }
 
     @Override
@@ -173,10 +177,11 @@ public class SystemUserServiceImpl implements SystemUserService {
         if (null == rainSystemUser) {
             throw BusinessException.operate(id + "不存在");
         }
-        RainSystemUser systemUser=new RainSystemUser();
-        systemUser.setId(rainSystemUser.getId());
-        systemUser.setPassword(passwordEncoder.encode(password));
-        rainSystemUserDao.updateByPrimaryKey(systemUser);
+        RainSystemUser updateUser=new RainSystemUser();
+        updateUser.setId(rainSystemUser.getId());
+        updateUser.setPassword(bCryptPasswordEncoder.encode(password));
+        updateUser.setUpdateTime(new Date());
+        rainSystemUserDao.updateByPrimaryKeySelective(updateUser);
     }
 
     @Override
@@ -184,8 +189,7 @@ public class SystemUserServiceImpl implements SystemUserService {
         //查询用户角色关联
         Example userRoleExample = new Example(RainUserRole.class);
         userRoleExample.createCriteria().andEqualTo("userId", id);
-        List<RainUserRole> rainUserRoleList = userRoleDao.selectByExample(userRoleExample);
-        userRoleExample.clear();
+        List<RainUserRole> rainUserRoleList = rainUserRoleDao.selectByExample(userRoleExample);
 
         //查询角色
         if(!CollectionUtils.isEmpty(rainUserRoleList)){
