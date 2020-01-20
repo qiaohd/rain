@@ -5,11 +5,13 @@ import com.github.pagehelper.PageInfo;
 import com.rao.dao.system.RainPermissionDao;
 import com.rao.dao.system.RainRoleDao;
 import com.rao.dao.system.RainRolePermissionDao;
+import com.rao.dao.system.RainUserRoleDao;
 import com.rao.exception.BusinessException;
 import com.rao.pojo.dto.SaveRoleDTO;
 import com.rao.pojo.entity.system.RainPermission;
 import com.rao.pojo.entity.system.RainRole;
 import com.rao.pojo.entity.system.RainRolePermission;
+import com.rao.pojo.entity.system.RainUserRole;
 import com.rao.pojo.vo.system.ListRoleVO;
 import com.rao.pojo.vo.system.PageRoleVO;
 import com.rao.pojo.vo.system.RoleDetailVO;
@@ -40,9 +42,11 @@ public class RoleServiceImpl implements RoleService {
     @Resource
     private RainRoleDao rainRoleDao;
     @Resource
-    private RainPermissionDao permissionDao;
+    private RainPermissionDao rainPermissionDao;
     @Resource
     private RainRolePermissionDao rainRolePermissionDao;
+    @Resource
+    private RainUserRoleDao rainUserRoleDao;
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
@@ -113,7 +117,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public void deleteRole(Long id) {
         RainRole rainRole = rainRoleDao.selectByPrimaryKey(id);
         if (null == rainRole) {
@@ -121,6 +125,19 @@ public class RoleServiceImpl implements RoleService {
         }
         rainRoleDao.deleteByPrimaryKey(id);
         deleteRolePermission(id);
+    }
+
+    @Override
+    public void deleteUserRole(Long userId, Long roleId) {
+        RainUserRole userRole = new RainUserRole();
+        userRole.setUserId(userId);
+        int count = rainUserRoleDao.selectCount(userRole);
+        if (count <= 1) {
+            // 如果用户角色只剩下一种，不让删除用户角色信息了
+            throw BusinessException.operate("用户至少拥有一种角色");
+        }
+        userRole.setRoleId(roleId);
+        rainUserRoleDao.delete(userRole);
     }
 
     /**
@@ -139,7 +156,7 @@ public class RoleServiceImpl implements RoleService {
      * @param permissions
      */
     private void checkPermission(List<Long> permissions){
-        List<RainPermission> permissionList =  permissionDao.listByPermissionIds(permissions);
+        List<RainPermission> permissionList =  rainPermissionDao.listByPermissionIds(permissions);
         if(CollectionUtils.isEmpty(permissionList)){
             // 根据权限id查询出的权限信息为空
             throw BusinessException.operate("非法操作，权限信息为空");

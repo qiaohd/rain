@@ -25,7 +25,7 @@
         <module>rain-security-auth</module>
         <module>rain-storage</module>
         <module>rain-manager</module>
-        <module>rain-resource</module>
+        <module>rain-content</module>
         <module>rain-user</module>
         <module>rain-quartz</module>
         <module>rain-log</module>
@@ -196,7 +196,7 @@
                 <version>${rain.server.util.version}</version>
             </dependency>
             <!-- common -->
-            
+
             <!-- configuration -->
             <dependency>
                 <groupId>com.rao</groupId>
@@ -204,7 +204,7 @@
                 <version>${rain.configuration.feign}</version>
             </dependency>
             <!-- configuration -->
-            
+
             <!-- feign-client -->
             <dependency>
                 <groupId>com.rao</groupId>

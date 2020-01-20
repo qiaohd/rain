@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.rao</groupId>
-    <artifactId>rain-resource</artifactId>
+    <artifactId>rain-content</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>rain-resource</name>
+    <name>rain-content</name>
     <description>Demo project for Spring Boot</description>
 
     <!-- 父工程 -->
@@ -17,7 +17,7 @@
         <artifactId>rain</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    
+
     <dependencies>
 
         <!-- 本地 jar -->
@@ -28,7 +28,7 @@
         </dependency>
         <!-- 微服务基本 jar -->
         <!-- 本地 jar -->
-        
+
     </dependencies>
 
     <dependencyManagement>
@@ -44,7 +44,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>rain-resource</finalName>
+        <finalName>rain-content</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

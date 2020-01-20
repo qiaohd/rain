@@ -1,6 +1,7 @@
 package com.rao.controller.system;
 
 import com.rao.annotation.BeanValid;
+import com.rao.annotation.SimpleValid;
 import com.rao.constant.permission.user.SystemCodeConstant;
 import com.rao.pojo.dto.SaveRoleDTO;
 import com.rao.pojo.vo.system.ListRoleVO;
@@ -14,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -59,7 +61,7 @@ public class RoleController {
      */
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('" + SystemCodeConstant.ADMIN_ROLE_DETAIL + "')")
-    public ResultMessage<RoleDetailVO> findRole(@PathVariable Long id) {
+    public ResultMessage<RoleDetailVO> findRole(@PathVariable("id") Long id) {
         RoleDetailVO roleDetailVO = roleService.findById(id);
         return ResultMessage.success(roleDetailVO);
     }
@@ -72,7 +74,7 @@ public class RoleController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('" + SystemCodeConstant.ADMIN_ROLE_UPDATE + "')")
-    public ResultMessage findRole(@PathVariable Long id, @BeanValid @RequestBody SaveRoleDTO roleDTO) {
+    public ResultMessage findRole(@PathVariable("id") Long id, @BeanValid @RequestBody SaveRoleDTO roleDTO) {
         roleService.updateRole(id, roleDTO);
         return ResultMessage.success();
     }
@@ -85,8 +87,8 @@ public class RoleController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('" + SystemCodeConstant.ADMIN_ROLE_DELETE + "')")
-    public ResultMessage delete(@PathVariable Long id) {
-       roleService.deleteRole(id);
+    public ResultMessage delete(@PathVariable("id") Long id) {
+        roleService.deleteRole(id);
         return ResultMessage.success("删除角色成功");
     }
 
@@ -96,9 +98,23 @@ public class RoleController {
      */
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('" + SystemCodeConstant.ADMIN_ROLE_LIST_ALL + "')")
-    public ResultMessage listRole(){
+    public ResultMessage<List<ListRoleVO>> listRole(){
         List<ListRoleVO> roleDetailVOList = roleService.listRole();
         return ResultMessage.success(roleDetailVOList);
     }
-    
+
+    /**
+     * 删除用户角色
+     * @param roleId
+     * @param userId
+     * @return
+     */
+    @DeleteMapping("/{roleId}")
+    @PreAuthorize("hasAuthority('" + SystemCodeConstant.ADMIN_ROLE_DELETE_USER + "')")
+    public ResultMessage deleteUserRole(@PathVariable("roleId") Long roleId,
+                                        @SimpleValid @NotNull(message = "用户id不能为空") @RequestParam Long userId){
+        roleService.deleteUserRole(userId, roleId);
+        return ResultMessage.success();
+    }
+
 }

@@ -54,4 +54,11 @@ public interface RoleService {
      * @param id
      */
     void deleteRole(Long id);
+
+    /**
+     * 删除用户角色
+     * @param userId
+     * @param roleId
+     */
+    void deleteUserRole(Long userId, Long roleId);
 }

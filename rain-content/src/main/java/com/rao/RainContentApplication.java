@@ -14,14 +14,13 @@ import tk.mybatis.spring.annotation.MapperScan;
  */
 @EnableEurekaClient
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = {"com.rao"})
-@MapperScan(value = "com.rao.dao.resource")
+@MapperScan(value = "com.rao.dao")
 @SpringBootApplication
-public class RainResourceApplication {
+public class RainContentApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(RainResourceApplication.class, args);
+        SpringApplication.run(RainContentApplication.class, args);
     }
-    
+
 }
 
