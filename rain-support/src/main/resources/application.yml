@@ -1,7 +1,7 @@
 server:
-  port: 8084
+  port: 8083
   servlet:
-    context-path: /content
+    context-path: /support
     tomcat:
       uri-encoding: utf-8
 
@@ -14,7 +14,7 @@ spring:
     active: test
   # eureka 注册名称
   application:
-    name: rain-content
+    name: rain-support
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
