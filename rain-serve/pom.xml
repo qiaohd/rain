@@ -3,20 +3,28 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.rao</groupId>
-    <artifactId>rain-content</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
-    <name>rain-content</name>
-    <description>Demo project for Spring Boot</description>
+    <modules>
+        <module>rain-storage</module>
+        <module>rain-support</module>
+        <module>rain-content</module>
+        <module>rain-user</module>
+        <module>rain-quartz</module>
+        <module>rain-log</module>
+        <module>rain-message</module>
+        <module>rain-payment</module>
+    </modules>
 
     <!-- 父工程 -->
     <parent>
-        <groupId>com.rao</groupId>
         <artifactId>rain</artifactId>
+        <groupId>com.rao</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+
+    <groupId>com.rao</groupId>
+    <artifactId>rain-serve</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <dependencies>
 
@@ -44,7 +52,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>rain-content</finalName>
+        <finalName>rain-user</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

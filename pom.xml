@@ -23,14 +23,7 @@
         <module>rain-eureka</module>
         <module>rain-gateway</module>
         <module>rain-security-auth</module>
-        <module>rain-storage</module>
-        <module>rain-support</module>
-        <module>rain-content</module>
-        <module>rain-user</module>
-        <module>rain-quartz</module>
-        <module>rain-log</module>
-        <module>rain-message</module>
-        <module>rain-payment</module>
+        <module>rain-serve</module>
     </modules>
 
     <properties>
