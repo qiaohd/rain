@@ -38,6 +38,12 @@ public class RainCampus implements Serializable {
     private String campusName;
 
     /**
+     * 学校logo
+     */
+    @Column(name = "campus_logo")
+    private String campusLogo;
+
+    /**
      * 省份code
      */
     @Column(name = "province_code")

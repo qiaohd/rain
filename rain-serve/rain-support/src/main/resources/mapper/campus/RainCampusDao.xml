@@ -8,6 +8,7 @@
     <resultMap id="RainCampusResultMap" type="com.rao.pojo.entity.campus.RainCampus">
         <id property="id" column="id"/>
         <result property="campusName" column="campus_name"/>
+        <result property="campusLogo" column="campus_logo"/>
         <result property="provinceCode" column="province_code"/>
         <result property="provinceName" column="province_name"/>
         <result property="cityCode" column="city_code"/>
@@ -20,11 +21,11 @@
 
     <!-- 定义可重用的SQL代码段，可以包含在其他语句中 -->
     <sql id="base_column">
-		 id ,campus_name ,province_code ,province_name ,city_code ,city_name ,weight ,status ,create_time ,update_time 
+		 id ,campus_name ,campus_logo, province_code ,province_name ,city_code ,city_name ,weight ,status ,create_time ,update_time
 	</sql>
 
     <sql id="base_value_column">
-		 #{id},#{campusName},#{provinceCode},#{provinceName},#{cityCode},#{cityName},#{weight},#{status},#{createTime},#{updateTime}
+		 #{id},#{campusName},#{campusLogo},#{provinceCode},#{provinceName},#{cityCode},#{cityName},#{weight},#{status},#{createTime},#{updateTime}
 	</sql>
 
 </mapper> 

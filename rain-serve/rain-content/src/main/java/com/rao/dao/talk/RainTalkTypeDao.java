@@ -1,7 +1,7 @@
 package com.rao.dao.talk;
 
+import com.rao.mapper.RainBaseDao;
 import com.rao.pojo.entity.talk.RainTalkType;
-import tk.mybatis.mapper.common.BaseMapper;
 
 /**
  * DAO - RainTalkType(讨论类型)
@@ -9,6 +9,6 @@ import tk.mybatis.mapper.common.BaseMapper;
  * @author raojing
  * @version 2.0
  */
-public interface RainTalkTypeDao extends BaseMapper<RainTalkType> {
+public interface RainTalkTypeDao extends RainBaseDao<RainTalkType> {
 
 }

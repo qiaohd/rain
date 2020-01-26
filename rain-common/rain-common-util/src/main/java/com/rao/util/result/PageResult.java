@@ -21,7 +21,7 @@ public class PageResult<T> {
     /**
      * 数据
      */
-    private List<T> data;
+    private List<T> list;
     
     public static<T> PageResult<T> build(Long total, List<T> data){
         return new PageResult<>(total, data);
