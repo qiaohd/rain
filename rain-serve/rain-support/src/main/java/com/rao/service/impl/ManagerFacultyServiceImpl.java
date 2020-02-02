@@ -55,7 +55,7 @@ public class ManagerFacultyServiceImpl implements ManagerFacultyService {
     }
 
     @Override
-    public Long addFaculty(SaveFacultyDTO saveFacultyDTO) {
+    public String addFaculty(SaveFacultyDTO saveFacultyDTO) {
         Date now = new Date();
         RainFaculty faculty = new RainFaculty();
         Long facultyId = TwiterIdUtil.getTwiterId();
@@ -64,11 +64,11 @@ public class ManagerFacultyServiceImpl implements ManagerFacultyService {
         faculty.setCreateTime(now);
         faculty.setUpdateTime(now);
         rainFacultyDao.insertSelective(faculty);
-        return facultyId;
+        return String.valueOf(facultyId);
     }
 
     @Override
-    public Long updateFaculty(Long id, SaveFacultyDTO saveFacultyDTO) {
+    public String updateFaculty(Long id, SaveFacultyDTO saveFacultyDTO) {
         RainFaculty faculty = rainFacultyDao.selectByPrimaryKey(id);
         if (faculty == null) {
             throw BusinessException.operate("院系不存在");
@@ -76,7 +76,7 @@ public class ManagerFacultyServiceImpl implements ManagerFacultyService {
         faculty.setFacultyName(saveFacultyDTO.getFacultyName());
         faculty.setUpdateTime(new Date());
         rainFacultyDao.updateByPrimaryKey(faculty);
-        return id;
+        return String.valueOf(id);
     }
 
     @Override

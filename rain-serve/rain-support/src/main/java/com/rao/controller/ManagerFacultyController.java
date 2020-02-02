@@ -43,8 +43,8 @@ public class ManagerFacultyController {
      * @return
      */
     @PostMapping()
-    public ResultMessage<Long> add(@BeanValid @RequestBody SaveFacultyDTO saveFacultyDTO) {
-        Long facultyId = managerFacultyService.addFaculty(saveFacultyDTO);
+    public ResultMessage<String> add(@BeanValid @RequestBody SaveFacultyDTO saveFacultyDTO) {
+        String facultyId = managerFacultyService.addFaculty(saveFacultyDTO);
         return ResultMessage.success(facultyId).message("新增院系成功");
     }
 
@@ -56,9 +56,9 @@ public class ManagerFacultyController {
      * @return
      */
     @PutMapping("/{id}")
-    public ResultMessage<Long> update(@PathVariable("id") Long id,
+    public ResultMessage<String> update(@PathVariable("id") Long id,
                                       @BeanValid @RequestBody SaveFacultyDTO saveFacultyDTO) {
-        Long facultyId = managerFacultyService.updateFaculty(id, saveFacultyDTO);
+        String facultyId = managerFacultyService.updateFaculty(id, saveFacultyDTO);
         return ResultMessage.success(facultyId).message("修改院系成功");
     }
 

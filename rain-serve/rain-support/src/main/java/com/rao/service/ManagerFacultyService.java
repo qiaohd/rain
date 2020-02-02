@@ -29,7 +29,7 @@ public interface ManagerFacultyService {
      * @param saveFacultyDTO
      * @return
      */
-    Long addFaculty(SaveFacultyDTO saveFacultyDTO);
+    String addFaculty(SaveFacultyDTO saveFacultyDTO);
 
     /**
      * 修改院系
@@ -38,7 +38,7 @@ public interface ManagerFacultyService {
      * @param saveFacultyDTO
      * @return
      */
-    Long updateFaculty(Long id, SaveFacultyDTO saveFacultyDTO);
+    String updateFaculty(Long id, SaveFacultyDTO saveFacultyDTO);
 
     /**
      * 删除院系-判断是否被占用
