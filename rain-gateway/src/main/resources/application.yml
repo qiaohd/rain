@@ -18,16 +18,6 @@ spring:
           lower-case-service-id: true
 
       routes:
-      - id: rain-manager
-        uri: lb://rain-manager
-        predicates:
-        - Path=/manager/**
-        
-      - id: rain-resource
-        uri: lb://rain-resource
-        predicates:
-          - Path=/resource/**
-
       - id: rain-storage
         uri: lb://rain-storage
         predicates:
