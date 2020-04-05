@@ -26,9 +26,9 @@ security:
     client:
       client-id: client
       client-secret: secret
-      access-token-uri: http://localhost:9000/auth/oauth/token
-      user-authorization-uri: http://localhost:9000/auth/oauth/authorize
+      access-token-uri: http://localhost:9000/api/auth/oauth/token
+      user-authorization-uri: http://localhost:9000/api/auth/oauth/authorize
       grant-type: password,refresh_token
       scope: backend
     resource:
-      user-info-uri: http://localhost:9000/auth/user/info
+      user-info-uri: http://localhost:9000/api/auth/user/info

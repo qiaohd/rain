@@ -45,7 +45,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>rain-eureka</finalName>
+        <finalName>${name}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

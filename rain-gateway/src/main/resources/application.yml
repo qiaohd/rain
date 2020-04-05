@@ -21,37 +21,65 @@ spring:
       - id: rain-storage
         uri: lb://rain-storage
         predicates:
-          - Path=/storage/**
+          - Path=/api/storage/**
+        filters:
+          - StripPrefix=1
 
       - id: rain-user
         uri: lb://rain-user
         predicates:
-          - Path=/user/**
+          - Path=/api/user/**
+        filters:
+          - StripPrefix=1
           
       - id: rain-auth
         uri: lb://rain-auth
         predicates:
-          - Path=/auth/**
+          - Path=/api/auth/**
+        filters:
+          - StripPrefix=1
           
       - id: rain-quartz
         uri: lb://rain-quartz
         predicates:
-          - Path=/quartz/**
+          - Path=/api/quartz/**
+        filters:
+          - StripPrefix=1
 
       - id: rain-log
         uri: lb://rain-log
         predicates:
-          - Path=/log/**
+          - Path=/api/log/**
+        filters:
+          - StripPrefix=1
 
       - id: rain-message
         uri: lb://rain-message
         predicates:
-          - Path=/message/**
+          - Path=/api/message/**
+        filters:
+          - StripPrefix=1
 
       - id: rain-payment
         uri: lb://rain-payment
         predicates:
-          - Path=/payment/**
+          - Path=/api/payment/**
+        filters:
+          - StripPrefix=1
+
+      - id: rain-content
+        uri: lb://rain-content
+        predicates:
+          - Path=/api/content/**
+        filters:
+          - StripPrefix=1
+
+      - id: rain-support
+        uri: lb://rain-support
+        predicates:
+          - Path=/api/support/**
+        filters:
+          - StripPrefix=1
 
 management:
   endpoint:
