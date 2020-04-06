@@ -12,5 +12,11 @@ public interface SystemInitService {
      * @param phone
      */
     void systemInit(String phone);
-    
+
+    /**
+     * 初始化会员角色
+     *
+     * @param userId
+     */
+    void initMemberRole(Long userId);
 }

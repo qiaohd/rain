@@ -18,6 +18,7 @@
     
     <modules>
         <module>rain-payment-feign-client</module>
+        <module>rain-user-feign-client</module>
     </modules>
 
     <dependencies>

@@ -2,6 +2,7 @@ package com.rao.service.impl;
 
 import com.rao.cache.key.UserCacheKey;
 import com.rao.client.MemberWalletClient;
+import com.rao.client.SystemInitClient;
 import com.rao.constant.common.DateFormatEnum;
 import com.rao.constant.common.StateConstants;
 import com.rao.constant.sms.SmsOperationTypeEnum;
@@ -43,6 +44,8 @@ public class UserServiceImpl implements UserService {
     private RedisTemplateUtils redisTemplateUtils;
     @Resource
     private MemberWalletClient memberWalletClient;
+    @Resource
+    private SystemInitClient systemInitClient;
 
     @Override
     public LoginUserBO findByAccountAndUserType(String userName, String type) {
@@ -93,7 +96,7 @@ public class UserServiceImpl implements UserService {
         redisTemplateUtils.set(userRegisterCacheKey, String.valueOf(memberId), CacheConstant.TIME_ONE);
         // 调用支付系统初始化用户钱包
         ResultMessage resultMessage = memberWalletClient.init(memberId);
-        if(!resultMessage.getCode().equals(DefaultSuccessMsgEnum.SUCCESS.getCode())){
+        if(!DefaultSuccessMsgEnum.SUCCESS.getCode().equals(resultMessage.getCode())){
             throw BusinessException.operate("系统故障，登录失败");
         }
 
@@ -120,6 +123,11 @@ public class UserServiceImpl implements UserService {
         rainMember.setCreateTime(now);
         rainMember.setUpdateTime(now);
         rainMemberDao.insert(rainMember);
+
+        /**
+         * 初始化会员角色信息
+         */
+        systemInitClient.initMemberRole(memberId);
         return rainMember;
     }
 

@@ -91,6 +91,10 @@
             <groupId>com.rao</groupId>
             <artifactId>rain-payment-feign-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.rao</groupId>
+            <artifactId>rain-user-feign-client</artifactId>
+        </dependency>
         <!-- 本地 jar -->
 
         <!-- 热部署插件 -->

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.rao.dto.WxUserInfo;
 import com.rao.exception.BusinessException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.util.StringUtils;
@@ -25,13 +26,14 @@ import java.util.Map;
  * @author raojing
  * @date 2020/1/6 15:45
  */
+@Slf4j
 public class WxAppletUtils {
     
     private final static String REQUEST_URL = "https://api.weixin.qq.com/sns/jscode2session";
     
-    private final static String APPID = "wx50fb244113824503";
+    private final static String APPID = "wx4fb61256982b85ec";
     
-    private final static String APP_SECRET = "19bd02121d4e2e39cbcc4898f3fc3b1c";
+    private final static String APP_SECRET = "7db6e608bc30f1d9e667af9cec598eb0";
     
     private final static String GRANT_TYPE = "authorization_code";
 
@@ -52,6 +54,7 @@ public class WxAppletUtils {
         requestUrlParam.put("js_code", code);
         // //默认参数-授权码模式 authorization_code
         requestUrlParam.put("grant_type", GRANT_TYPE);
+        log.info("调用微信接口参数 ---> appid:{}, secret:{}, js_code:{}", APPID, APP_SECRET, code);
         JSONObject jsonObject = JSON.parseObject(sendPost(REQUEST_URL, requestUrlParam));
         return jsonObject;
     }

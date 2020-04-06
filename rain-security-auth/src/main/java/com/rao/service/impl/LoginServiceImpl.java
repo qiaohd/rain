@@ -18,6 +18,7 @@ import com.rao.pojo.dto.PasswordLoginDTO;
 import com.rao.pojo.dto.RefreshTokenDTO;
 import com.rao.pojo.dto.SmsCodeLoginDTO;
 import com.rao.pojo.dto.WxLoginDTO;
+import com.rao.pojo.entity.RainMember;
 import com.rao.pojo.vo.LoginSuccessVO;
 import com.rao.service.LoginService;
 import com.rao.service.UserService;
@@ -26,6 +27,7 @@ import com.rao.util.cache.RedisTemplateUtils;
 import com.rao.util.wx.WxAppletUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.http.HttpEntity;
@@ -154,7 +156,10 @@ public class LoginServiceImpl implements LoginService {
         if(loginUserBO == null){
             if(accountType.equals(UserTypeEnum.C_USER.getValue())){
                 // 注册用户
-                userService.registerMember(openId);
+                RainMember member = userService.registerMember(openId);
+                loginUserBO = new LoginUserBO();
+                BeanUtils.copyProperties(member, loginUserBO);
+                loginUserBO.setNickName(member.getNickname());
             }else{
                 throw BusinessException.operate("账号不存在");
             }

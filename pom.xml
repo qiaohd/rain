@@ -54,6 +54,7 @@
         <rain.server.util.version>1.0-SNAPSHOT</rain.server.util.version>
         <rain.configuration.feign>1.0-SNAPSHOT</rain.configuration.feign>
         <rain.payment.feign.client>1.0-SNAPSHOT</rain.payment.feign.client>
+        <rain.user.feign.client>1.0-SNAPSHOT</rain.user.feign.client>
     </properties>
 
     <dependencyManagement>
@@ -203,6 +204,11 @@
                 <groupId>com.rao</groupId>
                 <artifactId>rain-payment-feign-client</artifactId>
                 <version>${rain.payment.feign.client}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rao</groupId>
+                <artifactId>rain-user-feign-client</artifactId>
+                <version>${rain.user.feign.client}</version>
             </dependency>
             <!-- feign-client -->
             <!-- 本地jar -->
