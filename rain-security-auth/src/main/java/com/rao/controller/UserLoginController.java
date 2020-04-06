@@ -1,11 +1,14 @@
 package com.rao.controller;
 
 import com.rao.annotation.BeanValid;
+import com.rao.dto.WxUserInfo;
 import com.rao.pojo.dto.*;
 import com.rao.pojo.vo.LoginSuccessVO;
 import com.rao.service.LoginService;
 import com.rao.service.UserService;
 import com.rao.util.result.ResultMessage;
+import com.rao.util.wx.WxAppletUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -89,6 +92,19 @@ public class UserLoginController {
     public ResultMessage logout(){
         loginService.logout();
         return ResultMessage.success().message("用户注销成功");
+    }
+
+    /**
+     * 测试微信解密用户信息api
+     * @param encryptedData
+     * @param sessionKey
+     * @param iv
+     * @return
+     */
+    @GetMapping(value = "/test_wx_api")
+    public ResultMessage testWxApi(String encryptedData, String sessionKey, String iv){
+        WxUserInfo userInfo = WxAppletUtils.getUserInfo(encryptedData, sessionKey, iv);
+        return ResultMessage.success(userInfo);
     }
     
 }

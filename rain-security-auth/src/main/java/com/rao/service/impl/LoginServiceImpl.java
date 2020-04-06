@@ -170,6 +170,7 @@ public class LoginServiceImpl implements LoginService {
         }
         // 获取 access_token 和 refresh_token
         LoginSuccessVO loginSuccessVO = requestAccessToken(buildLoginParam(accountType, openId, "", false));
+        loginSuccessVO.setSessionKey(sessionKey);
         //发送登录日志
         UserLoginLogoutLogBO userLoginLogoutLogBO = CopyUtil.transToObj(loginUserBO, UserLoginLogoutLogBO.class);
         userLoginLogoutLogBO.setUserId(loginUserBO.getId());

@@ -4,7 +4,7 @@ import com.rao.annotation.BeanValid;
 import com.rao.pojo.bo.CurrentUserInfo;
 import com.rao.pojo.dto.RePasswordDTO;
 import com.rao.pojo.vo.user.UserInfoVO;
-import com.rao.service.user.CurrentUserService;
+import com.rao.service.user.CurrentSystemUserService;
 import com.rao.util.result.ResultMessage;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 public class CurrentSystemUserController {
 
     @Resource
-    private CurrentUserService currentUserService;
+    private CurrentSystemUserService currentSystemUserService;
 
     /**
      * 查询当前用户信息
@@ -30,7 +30,7 @@ public class CurrentSystemUserController {
      */
     @GetMapping()
     public ResultMessage<CurrentSystemUserVO> findByAccount(CurrentUserInfo currentUser){
-        CurrentSystemUserVO systemUserVO = currentUserService.findById(currentUser.getId());
+        CurrentSystemUserVO systemUserVO = currentSystemUserService.findById(currentUser.getId());
         return ResultMessage.success(systemUserVO);
     }
 
@@ -41,7 +41,7 @@ public class CurrentSystemUserController {
     @GetMapping("/info")
     @ApiOperation(value = "查询当前用户详细信息",httpMethod = "GET")
     public ResultMessage<UserInfoVO> findUserInfo(CurrentUserInfo currentUser) {
-        UserInfoVO userInfoVO = currentUserService.info(currentUser.getId());
+        UserInfoVO userInfoVO = currentSystemUserService.info(currentUser.getId());
         return ResultMessage.success(userInfoVO);
     }
 
@@ -51,7 +51,7 @@ public class CurrentSystemUserController {
      */
     @PutMapping("/password")
     public ResultMessage rePassword(CurrentUserInfo currentUser, @BeanValid @RequestBody RePasswordDTO rePasswordDTO) {
-        currentUserService.rePassword(currentUser.getId(), rePasswordDTO.getOldPassword(), rePasswordDTO.getNewPassword(),rePasswordDTO.getRePassword());
+        currentSystemUserService.rePassword(currentUser.getId(), rePasswordDTO.getOldPassword(), rePasswordDTO.getNewPassword(),rePasswordDTO.getRePassword());
         return ResultMessage.success();
     }
 

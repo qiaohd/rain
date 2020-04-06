@@ -60,7 +60,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/login/pwd",
                         "/login/sms_code",
                         "/login/wx",
-                        "/check_account");
+                        "/check_account",
+                        "/test_wx_api"
+                );
     }
 
     @Override

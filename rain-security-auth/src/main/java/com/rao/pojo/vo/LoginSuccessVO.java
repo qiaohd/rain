@@ -31,4 +31,9 @@ public class LoginSuccessVO {
      */
     private String expire;
 
+    /**
+     * 仅微信登录有值
+     */
+    private String sessionKey;
+
 }

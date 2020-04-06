@@ -80,7 +80,7 @@ public class RainMember {
     private String avatar;
 
     /**
-     * 性别 1-男 2-女
+     * 性别 0-未知 1-男 2-女
      */
     @Column(name = "gender")
     private Integer gender;

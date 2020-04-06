@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.rao.annotation.IgnoreTokenAuth;
 import com.rao.pojo.bo.CurrentUserInfo;
 import com.rao.util.auth.CurrentUserUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -20,6 +21,7 @@ import java.lang.reflect.Parameter;
  * @author raojing
  * @date 2019/12/6 23:00
  */
+@Slf4j
 @Aspect
 @Order(7)
 @Component
@@ -52,6 +54,7 @@ public class CurrentUserInfoAspect {
         CurrentUserInfo currentUser = null;
         try{
             currentUser = JSON.parseObject(CurrentUserUtil.getCurrentUserInfoJsonFormat(), CurrentUserInfo.class);
+            log.info("当前用户信息:{}", currentUser);
         }catch (Exception e){
             return joinPoint.proceed();
         }

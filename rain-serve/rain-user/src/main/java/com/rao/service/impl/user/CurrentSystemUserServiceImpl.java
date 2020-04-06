@@ -13,7 +13,7 @@ import com.rao.util.common.CopyUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.rao.service.user.CurrentUserService;
+import com.rao.service.user.CurrentSystemUserService;
 import com.rao.pojo.vo.user.CurrentSystemUserVO;
 import org.springframework.util.CollectionUtils;
 import tk.mybatis.mapper.entity.Example;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * @date 2019/11/25 23:19
  */
 @Service
-public class CurrentUserServiceImpl implements CurrentUserService {
+public class CurrentSystemUserServiceImpl implements CurrentSystemUserService {
 
     @Resource
     private RainSystemUserDao rainSystemUserDao;

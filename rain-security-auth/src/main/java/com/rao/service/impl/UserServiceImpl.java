@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
         rainMember.setPhone("");
         // 初始密码为 "" 的加密串
         rainMember.setPassword(UserCommonConstant.DEFAULT_PWD);
-        rainMember.setNickname(userName);
+        rainMember.setNickname("");
         rainMember.setWxOpenid(wxOpenId);
         rainMember.setWxNickname("");
         rainMember.setEmail("");

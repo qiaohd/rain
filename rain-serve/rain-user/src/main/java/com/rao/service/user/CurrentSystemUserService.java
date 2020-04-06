@@ -7,7 +7,7 @@ import com.rao.pojo.vo.user.UserInfoVO;
  * @author raojing
  * @date 2019/11/25 23:18
  */
-public interface CurrentUserService {
+public interface CurrentSystemUserService {
 
     /**
      * 根据用户id查询用户信息
