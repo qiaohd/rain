@@ -12,6 +12,8 @@
         <module>rain-log</module>
         <module>rain-message</module>
         <module>rain-payment</module>
+        <module>rain-product</module>
+        <module>rain-order</module>
     </modules>
 
     <!-- 父工程 -->

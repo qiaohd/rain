@@ -81,6 +81,20 @@ spring:
         filters:
           - StripPrefix=1
 
+      - id: rain-product
+        uri: lb://rain-product
+        predicates:
+          - Path=/api/product/**
+        filters:
+          - StripPrefix=1
+
+      - id: rain-order
+        uri: lb://rain-order
+        predicates:
+          - Path=/api/order/**
+        filters:
+          - StripPrefix=1
+
 management:
   endpoint:
     conditions:
