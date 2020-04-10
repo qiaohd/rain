@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rao.dao.RainOrderDisposeLogDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rao.pojo.entity.RainOrderDisposeLog">
+        <id column="order_id" property="orderId" />
+        <result column="dispose_is_manager" property="disposeIsManager" />
+        <result column="dispose_user_id" property="disposeUserId" />
+        <result column="dispose_nickname" property="disposeNickname" />
+        <result column="operation_desc" property="operationDesc" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        order_id, dispose_is_manager, dispose_user_id, dispose_nickname, operation_desc, create_time
+    </sql>
+
+</mapper>
