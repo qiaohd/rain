@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rao.dao.RainOrderBroadbandSubDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rao.pojo.entity.RainOrderBroadbandSub">
+        <id column="order_id" property="orderId" />
+        <result column="trade_type" property="tradeType" />
+        <result column="campus_id" property="campusId" />
+        <result column="campus_name" property="campusName" />
+        <result column="faculty_id" property="facultyId" />
+        <result column="faculty_name" property="facultyName" />
+        <result column="major_name" property="majorName" />
+        <result column="grade" property="grade" />
+        <result column="qr_code_image" property="qrCodeImage" />
+        <result column="trade_code" property="tradeCode" />
+        <result column="dispose_time" property="disposeTime" />
+        <result column="pay_time" property="payTime" />
+        <result column="complete_time" property="completeTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        order_id, trade_type, campus_id, campus_name, faculty_id, faculty_name, major_name, grade, qr_code_image, trade_code, dispose_time, pay_time, complete_time
+    </sql>
+
+</mapper>

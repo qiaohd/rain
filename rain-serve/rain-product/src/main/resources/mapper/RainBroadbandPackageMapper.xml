@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rao.dao.RainBroadbandPackageDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rao.pojo.entity.RainBroadbandPackage">
+        <id column="id" property="id" />
+        <result column="package_name" property="packageName" />
+        <result column="product_id" property="productId" />
+        <result column="campus_original_price" property="campusOriginalPrice" />
+        <result column="campus_discount_price" property="campusDiscountPrice" />
+        <result column="family_original_price" property="familyOriginalPrice" />
+        <result column="family_discount_price" property="familyDiscountPrice" />
+        <result column="status" property="status" />
+        <result column="weight" property="weight" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, package_name, product_id, campus_original_price, campus_discount_price, family_original_price, family_discount_price, status, weight, create_time, update_time
+    </sql>
+
+</mapper>
