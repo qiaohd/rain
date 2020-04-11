@@ -12,6 +12,11 @@ import lombok.Data;
 public class ListAdvertVO {
 
     /**
+     * 广告标题
+     */
+    private String title;
+
+    /**
      * 图片
      */
     private String imageUrl;

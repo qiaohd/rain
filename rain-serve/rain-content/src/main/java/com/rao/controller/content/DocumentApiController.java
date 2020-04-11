@@ -1,5 +1,6 @@
 package com.rao.controller.content;
 
+import com.rao.util.result.ResultMessage;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,4 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/document")
 public class DocumentApiController {
+
+
+    public ResultMessage dd(){
+
+        return ResultMessage.success();
+    }
+
 }
