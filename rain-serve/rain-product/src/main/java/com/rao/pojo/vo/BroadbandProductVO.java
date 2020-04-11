@@ -1,19 +1,17 @@
-package com.rao.pojo.vo.content;
+package com.rao.pojo.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
- * 文章列表-视图模型
+ * 产品-视图对象
  *
  * @author raojing
- * @date 2020/4/11 18:28
+ * @date 2020/4/11 20:50
  */
 @Data
-public class ListDocumentVO {
+public class BroadbandProductVO {
 
     /**
      * id
@@ -22,13 +20,18 @@ public class ListDocumentVO {
     private Long id;
 
     /**
-     * 文章名称
+     * 产品标题
      */
-    private String title;
+    private String productTitle;
 
     /**
-     * 创建时间
+     * 产品描述
      */
-    private Date createTime;
+    private String productDesc;
+
+    /**
+     * 首页展示图片
+     */
+    private String indexImage;
 
 }
