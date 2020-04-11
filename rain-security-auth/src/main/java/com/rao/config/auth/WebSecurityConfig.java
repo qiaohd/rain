@@ -1,6 +1,8 @@
 package com.rao.config.auth;
 
 import com.rao.service.impl.UserDetailsServiceImpl;
+import com.rao.util.ScanIgnorePathUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,11 +16,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
+
 /**
  * 安全配置
  * @author raojing
  * @date 2019/12/2 13:20
  */
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -55,14 +60,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+        // 获取所有加了 IgnoreTokenAuth 注解的url
+        List<String> allIgnoreTokenAuthUrl = ScanIgnorePathUtil.getAllIgnoreTokenAuthUrl("com.rao.controller");
+        log.info("allIgnoreTokenAuthUrl: {}", allIgnoreTokenAuthUrl);
         web.ignoring()
-                .antMatchers(
-                        "/login/pwd",
-                        "/login/sms_code",
-                        "/login/wx",
-                        "/check_account",
-                        "/test_wx_api"
-                );
+                .antMatchers(allIgnoreTokenAuthUrl.toArray(new String[]{}));
     }
 
     @Override

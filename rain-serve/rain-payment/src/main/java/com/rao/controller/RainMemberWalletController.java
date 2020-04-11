@@ -1,5 +1,6 @@
 package com.rao.controller;
 
+import com.rao.annotation.IgnoreTokenAuth;
 import com.rao.annotation.SimpleValid;
 import com.rao.pojo.bo.CurrentUserInfo;
 import com.rao.service.RainMemberWalletService;
@@ -30,7 +31,8 @@ public class RainMemberWalletController {
      * 从缓存中获取用户注册信息，再进行初始化操作，保证数据安全性
      * @param userId
      * @return
-     */    
+     */
+    @IgnoreTokenAuth
     @PostMapping("/init")
     public ResultMessage init(@SimpleValid @NotNull(message = "用户id不能为空") @RequestParam("userId") Long userId){
         rainMemberWalletService.initWallet(userId);

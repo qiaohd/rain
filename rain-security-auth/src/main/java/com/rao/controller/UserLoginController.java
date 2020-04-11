@@ -1,6 +1,8 @@
 package com.rao.controller;
 
 import com.rao.annotation.BeanValid;
+import com.rao.annotation.IgnoreTokenAuth;
+import com.rao.annotation.SimpleParam;
 import com.rao.dto.WxUserInfo;
 import com.rao.pojo.dto.*;
 import com.rao.pojo.vo.LoginSuccessVO;
@@ -34,6 +36,7 @@ public class UserLoginController {
      * @param passwordLoginDTO
      * @return
      */
+    @IgnoreTokenAuth
     @PostMapping(value = "/login/pwd")
     public ResultMessage<LoginSuccessVO> loginSystemUser(@BeanValid @RequestBody PasswordLoginDTO passwordLoginDTO) {
         LoginSuccessVO loginSuccessVO = loginService.pwdLogin(passwordLoginDTO);
@@ -45,6 +48,7 @@ public class UserLoginController {
      * @param smsCodeLoginDTO
      * @return
      */
+    @IgnoreTokenAuth
     @PostMapping(value = "/login/sms_code")
     public ResultMessage<LoginSuccessVO> smsCodeLoginSystemUser(@BeanValid @RequestBody SmsCodeLoginDTO smsCodeLoginDTO){
         LoginSuccessVO loginSuccessVO = loginService.smsCodeLogin(smsCodeLoginDTO);
@@ -56,6 +60,7 @@ public class UserLoginController {
      * @param wxLoginDTO
      * @return
      */
+    @IgnoreTokenAuth
     @PostMapping(value = "/login/wx")
     public ResultMessage wxLoginCUser(@BeanValid @RequestBody WxLoginDTO wxLoginDTO){
         LoginSuccessVO loginSuccessVO = loginService.wxLogin(wxLoginDTO);
@@ -78,6 +83,7 @@ public class UserLoginController {
      * @param smsSendDTO
      * @return
      */
+    @IgnoreTokenAuth
     @PostMapping(value = "/check_account")
     public ResultMessage checkAccount(@BeanValid @RequestBody SmsSendDTO smsSendDTO){
         userService.checkAccount(smsSendDTO);
@@ -101,8 +107,9 @@ public class UserLoginController {
      * @param iv
      * @return
      */
-    @GetMapping(value = "/test_wx_api")
-    public ResultMessage testWxApi(String encryptedData, String sessionKey, String iv){
+    @IgnoreTokenAuth
+    @PostMapping(value = "/test_wx_api")
+    public ResultMessage testWxApi(@SimpleParam String encryptedData, @SimpleParam String sessionKey, @SimpleParam String iv){
         WxUserInfo userInfo = WxAppletUtils.getUserInfo(encryptedData, sessionKey, iv);
         return ResultMessage.success(userInfo);
     }

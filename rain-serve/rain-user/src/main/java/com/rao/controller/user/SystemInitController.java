@@ -1,5 +1,6 @@
 package com.rao.controller.user;
 
+import com.rao.annotation.IgnoreTokenAuth;
 import com.rao.annotation.SimpleValid;
 import com.rao.service.user.SystemInitService;
 import com.rao.util.result.ResultMessage;
@@ -30,6 +31,7 @@ public class SystemInitController {
      *
      * @return
      */
+    @IgnoreTokenAuth
     @PostMapping("/system")
     public ResultMessage systemInit(@SimpleValid @NotBlank(message = "手机号码不能为空") @RequestParam String phone) {
         systemInitService.systemInit(phone);
@@ -42,6 +44,7 @@ public class SystemInitController {
      * @param userId
      * @return
      */
+    @IgnoreTokenAuth
     @PostMapping("/member_role")
     public ResultMessage initMemberRole(@SimpleValid @NotNull(message = "用户id不能为空") @RequestParam("userId") Long userId) {
         systemInitService.initMemberRole(userId);
