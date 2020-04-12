@@ -12,7 +12,7 @@ import com.rao.pojo.dto.SaveFacultyDTO;
 import com.rao.pojo.entity.campus.RainCampusFaculty;
 import com.rao.pojo.entity.campus.RainFaculty;
 import com.rao.pojo.vo.PageFacultyVO;
-import com.rao.service.ManagerFacultyService;
+import com.rao.service.FacultyService;
 import com.rao.util.common.CopyUtil;
 import com.rao.util.common.TwiterIdUtil;
 import com.rao.util.page.PageParam;
@@ -31,7 +31,7 @@ import java.util.List;
  * @date 2020/1/26 13:29
  */
 @Service
-public class ManagerFacultyServiceImpl implements ManagerFacultyService {
+public class FacultyServiceImpl implements FacultyService {
 
     @Resource
     private RainFacultyDao rainFacultyDao;

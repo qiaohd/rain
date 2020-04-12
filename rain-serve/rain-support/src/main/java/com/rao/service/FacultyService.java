@@ -12,7 +12,7 @@ import com.rao.util.result.PageResult;
  * @author raojing
  * @date 2020/1/26 13:27
  */
-public interface ManagerFacultyService {
+public interface FacultyService {
 
     /**
      * 院系列表-分页
