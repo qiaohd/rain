@@ -1,5 +1,6 @@
 package com.rao.controller;
 
+import com.rao.annotation.IgnoreTokenAuth;
 import com.rao.pojo.vo.ListCampusVO;
 import com.rao.pojo.vo.ListFacultyVO;
 import com.rao.service.CampusService;
@@ -30,6 +31,7 @@ public class CampusApiController {
      *
      * @return
      */
+    @IgnoreTokenAuth
     @GetMapping()
     public ResultMessage<List<ListCampusVO>> allCampus() {
         List<ListCampusVO> listCampus = campusService.allCampus();
@@ -42,6 +44,7 @@ public class CampusApiController {
      * @param campusId
      * @return
      */
+    @IgnoreTokenAuth
     @GetMapping("/faculty/{campus_id}")
     public ResultMessage listFaculty(@PathVariable("campus_id") Long campusId) {
         List<ListFacultyVO> listFaculty = campusService.listFacultyByCampusId(campusId);
