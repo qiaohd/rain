@@ -1,6 +1,10 @@
 package com.rao.pojo.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 学校列表-视图模型
@@ -11,6 +15,45 @@ import lombok.Data;
 @Data
 public class PageCampusVO {
 
-    private String facultyName;
+    /**
+     * id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
+
+    /**
+     * 学校名称
+     */
+    private String campusName;
+
+    /**
+     * 学校logo
+     */
+    private String campusLogo;
+
+    /**
+     * 省份名称
+     */
+    private String provinceName;
+
+    /**
+     * 城市名称
+     */
+    private String cityName;
+
+    /**
+     * 状态 1-启用 2-禁用
+     */
+    private Integer status;
+
+    /**
+     * 权重
+     */
+    private Integer weight;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
 }

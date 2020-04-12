@@ -29,7 +29,7 @@ public class RainRegion implements Serializable {
      * 索引ID
      */
     @Id
-    private String id;
+    private Integer id;
 
     /**
      * 地区名称
@@ -41,7 +41,7 @@ public class RainRegion implements Serializable {
      * 地区父ID
      */
     @Column(name = "area_parent_id")
-    private Long areaParentId;
+    private Integer areaParentId;
 
     /**
      * 排序

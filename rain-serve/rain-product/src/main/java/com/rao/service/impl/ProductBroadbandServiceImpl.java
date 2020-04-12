@@ -45,7 +45,7 @@ public class ProductBroadbandServiceImpl implements ProductBroadbandService {
                 .andEqualTo("status", StateConstants.STATE_ENABLE);
         example.orderBy("weight").desc();
         List<RainProductBroadband> broadbandList = rainProductBroadbandDao.selectByExample(example);
-        PageInfo<RainProductBroadband> pageInfo = new PageInfo(broadbandList);
+        PageInfo<RainProductBroadband> pageInfo = PageInfo.of(broadbandList);
         List<BroadbandProductVO> broadbandVOList = CopyUtil.transToObjList(broadbandList, BroadbandProductVO.class);
         return PageResult.build(pageInfo.getTotal(), broadbandVOList);
     }
