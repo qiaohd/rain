@@ -32,12 +32,19 @@ public class AdvertServiceImpl implements AdvertService {
         Date now = new Date();
         example.createCriteria()
                 .andEqualTo("status", StateConstants.STATE_ENABLE)
-                .andEqualTo("adType", type)
-                .andGreaterThanOrEqualTo("startTime", now)
-                .andLessThanOrEqualTo("endTime", now);
+                .andEqualTo("position", type)
+                .andLessThanOrEqualTo("startTime", now)
+                .andGreaterThanOrEqualTo("endTime", now);
         List<RainAdvert> adverts = rainAdvertDao.selectByExample(example);
         return adverts.stream().map(item -> {
-            return CopyUtil.transToObj(item, ListAdvertVO.class);
+            ListAdvertVO advertVO = CopyUtil.transToObj(item, ListAdvertVO.class);
+            int adType = item.getAdType();
+            if (adType == 1) {
+                advertVO.setAdContent(item.getAdUrl());
+            } else if (adType == 2) {
+                advertVO.setAdContent(String.valueOf(item.getDocumentId()));
+            }
+            return advertVO;
         }).collect(Collectors.toList());
     }
 

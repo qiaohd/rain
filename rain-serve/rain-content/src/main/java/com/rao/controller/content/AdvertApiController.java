@@ -34,7 +34,7 @@ public class AdvertApiController {
      */
     @IgnoreTokenAuth
     @PostMapping("/list")
-    public ResultMessage<List<ListAdvertVO>> list(@SimpleParam @SimpleValid @NotNull(message = "广告类型不能为空") @Range(min = 1, max = 3, message = "广告类型不合法") Integer type){
+    public ResultMessage<List<ListAdvertVO>> list(@SimpleParam @SimpleValid @NotNull(message = "广告类型不能为空") @Range(min = 1, max = 2, message = "广告类型不合法") Integer type){
         List<ListAdvertVO> listAdvert =  advertService.listByType(type);
         return ResultMessage.success(listAdvert).message("获取广告列表成功");
     }
