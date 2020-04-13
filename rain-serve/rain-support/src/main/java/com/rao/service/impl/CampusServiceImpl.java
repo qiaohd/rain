@@ -2,6 +2,7 @@ package com.rao.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.rao.constant.common.StateConstants;
 import com.rao.dao.campus.RainCampusDao;
 import com.rao.dao.campus.RainCampusFacultyDao;
@@ -23,6 +24,7 @@ import com.rao.util.result.PageResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
@@ -124,7 +126,9 @@ public class CampusServiceImpl implements CampusService {
         RainCampusFaculty campusFaculty = new RainCampusFaculty();
         campusFaculty.setCampusId(campusId);
         List<Long> facultyIdList = rainCampusFacultyDao.select(campusFaculty).stream().map(item -> item.getFacultyId()).collect(Collectors.toList());
-
+        if(CollectionUtils.isEmpty(facultyIdList)){
+            return Lists.newArrayList();
+        }
         Example example = new Example(RainFaculty.class);
         example.createCriteria().andIn("id", facultyIdList);
         example.orderBy("weight").desc();
