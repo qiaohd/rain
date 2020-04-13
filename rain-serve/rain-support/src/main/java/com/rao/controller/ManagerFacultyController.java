@@ -30,8 +30,8 @@ public class ManagerFacultyController {
      *
      * @return
      */
-    @GetMapping()
-    public ResultMessage<PageResult<PageFacultyVO>> list(PageParam pageParam, PageFacultyDTO pageFacultyDTO) {
+    @PostMapping("/list")
+    public ResultMessage<PageResult<PageFacultyVO>> list(@RequestBody PageParam pageParam, @RequestBody PageFacultyDTO pageFacultyDTO) {
         PageResult<PageFacultyVO> pageResult = facultyService.pageFaculty(pageParam, pageFacultyDTO);
         return ResultMessage.success(pageResult).message("查询院系列表成功");
     }

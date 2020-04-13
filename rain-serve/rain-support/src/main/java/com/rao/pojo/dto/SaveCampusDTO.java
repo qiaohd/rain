@@ -4,7 +4,9 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 保存学校-数据传输模型
@@ -51,5 +53,11 @@ public class SaveCampusDTO {
     @Range(min = 1, max = 2, message = "状态值非法")
     @NotNull(message = "状态不能为空")
     private Integer status;
+
+    /**
+     * 院系id
+     */
+    @NotEmpty(message = "院系不能为空")
+    private List<Long> facultyIds;
 
 }

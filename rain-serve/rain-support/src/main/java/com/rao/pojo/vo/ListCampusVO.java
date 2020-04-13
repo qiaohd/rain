@@ -17,7 +17,7 @@ public class ListCampusVO {
      * id
      */
     @JsonSerialize(using = ToStringSerializer.class)
-    private String id;
+    private Long id;
 
     /**
      * 学校名称

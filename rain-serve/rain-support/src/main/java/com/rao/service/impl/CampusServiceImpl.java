@@ -77,10 +77,17 @@ public class CampusServiceImpl implements CampusService {
         rainCampus.setCreateTime(now);
         rainCampus.setUpdateTime(now);
         rainCampusDao.insertSelective(rainCampus);
+
+        // 保存学校和院系关系
+        List<RainCampusFaculty> campusFaculties = saveCampusDTO.getFacultyIds().stream().map(item -> {
+            return new RainCampusFaculty(rainCampus.getId(), item);
+        }).collect(Collectors.toList());
+        rainCampusFacultyDao.insertList(campusFaculties);
         return String.valueOf(rainCampus.getId());
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public String updateCampus(Long id, SaveCampusDTO saveCampusDTO) {
         RainCampus rainCampus = rainCampusDao.selectByPrimaryKey(id);
         BeanUtils.copyProperties(saveCampusDTO, rainCampus);
@@ -92,6 +99,16 @@ public class CampusServiceImpl implements CampusService {
         rainCampus.setCityName(region.getOrDefault(Integer.valueOf(cityCode), "未知"));
         rainCampus.setUpdateTime(new Date());
         rainCampusDao.updateByPrimaryKeySelective(rainCampus);
+
+        // 删除之前学校和院系之间的关系
+        RainCampusFaculty campusFaculty = new RainCampusFaculty();
+        campusFaculty.setCampusId(id);
+        rainCampusFacultyDao.delete(campusFaculty);
+        // 保存新的学校和院系关系
+        List<RainCampusFaculty> campusFaculties = saveCampusDTO.getFacultyIds().stream().map(item -> {
+            return new RainCampusFaculty(rainCampus.getId(), item);
+        }).collect(Collectors.toList());
+        rainCampusFacultyDao.insertList(campusFaculties);
         return String.valueOf(id);
     }
 
